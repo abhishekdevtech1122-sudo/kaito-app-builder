@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="hi" id="htmlRoot">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Star Merchant - Secure Dashboard</title>
+  
+  <!-- OneSignal SDK (Push Notification Engine) -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "8e294ccb-8236-4513-8860-86cf0cf1b275",
+      });
+    });
+  </script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    body { background-color: #E5E7EB; display: flex; justify-content: center; overflow-x: hidden; }
+    
+    .device-shell { width: 100%; max-width: 480px; min-height: 100vh; background-color: #F8F9FA; position: relative; display: flex; flex-direction: column; padding-bottom: 75px; box-shadow: 0 0 20px rgba(0,0,0,0.1); background-clip: padding-box; }
+    
+    .top-header { background-color: #FFFFFF; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E9ECEF; position: sticky; top: 0; z-index: 40; width: 100%; }
+    .brand-title { font-size: 16px; font-weight: 900; letter-spacing: 0.5px; color: #111827; display: flex; align-items: center; gap: 5px; user-select: none; }
+    .brand-title .star-badge { color: #F59E0B; font-size: 15px; }
+    .header-right-box { display: flex; align-items: center; gap: 8px; }
+    .header-msg-btn { width: 36px; height: 36px; background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; position: relative; }
+    .header-msg-btn.noti::after { content: ''; position: absolute; top: 6px; right: 8px; width: 8px; height: 8px; background: #EF4444; border-radius: 50%; border: 2px solid #fff; }
+    .lang-switch-btn { background: #FEF3C7; border: 1px solid #FDE68A; padding: 4px 8px; border-radius: 10px; color: #B45309; font-size: 11px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+
+    .noti-overlay, .reel-action-sheet, .custom-popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; opacity: 0; transition: opacity 0.3s; justify-content: center; align-items: center; }
+    .custom-popup-overlay { z-index: 999998; } 
+    .noti-overlay.open, .reel-action-sheet.open, .custom-popup-overlay.open { display: flex; opacity: 1; }
+    .noti-overlay { align-items: stretch; justify-content: flex-end; z-index: 999998; }
+    
+    .noti-sidebar { width: 85%; max-width: 340px; height: 100vh; background: #FFFFFF; transform: translateX(100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.15); }
+    .noti-overlay.open .noti-sidebar { transform: translateX(0); }
+    .noti-header { background: #111827; padding: 16px; display: flex; justify-content: space-between; align-items: center; color: #fff; }
+    .noti-title { font-size: 16px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
+    .noti-close-btn { background: none; border: none; color: #F59E0B; font-size: 28px; font-weight: 300; cursor: pointer; line-height: 1; }
+    .noti-content { padding: 16px; overflow-y: auto; flex: 1; background: #F8F9FA; }
+    
+    .tab-screen { display: none; padding: 14px; width: 100%; }
+    .tab-screen.active { display: block; }
+    
+    .status-card, .action-card, .studio-upload-box, .profile-card, .notes-bar-container, .calc-container { background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px; padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
+    .status-card { display: flex; justify-content: space-between; align-items: center; }
+    .status-info-title { font-size: 13px; font-weight: 800; color: #111827; }
+    .status-info-sub { font-size: 10px; color: #6B7280; margin-top: 2px; }
+    
+    .switch { position: relative; display: inline-block; width: 46px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #E5E7EB; transition: .2s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    input:checked + .slider { background-color: #059669; }
+    input:checked + .slider:before { transform: translateX(22px); }
+    
+    .metric-card { background: linear-gradient(135deg, #111827, #1F2937); color: #FFFFFF; border-radius: 14px; padding: 16px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .metric-title { font-size: 12px; font-weight: 700; color: #9CA3AF; }
+    .metric-value { font-size: 26px; font-weight: 900; color: #F59E0B; margin: 4px 0; }
+    .metric-sub { font-size: 11px; color: #D1D5DB; }
+    
+    .action-card-title { font-size: 14px; font-weight: 800; color: #111827; margin-bottom: 10px; }
+    .input-group { margin-bottom: 10px; text-align: left; }
+    .input-group label { display: block; font-size: 11px; font-weight: 700; color: #4B5563; margin-bottom: 3px; }
+    .input-group input, .input-group textarea { width: 100%; padding: 10px; border: 1px solid #D1D5DB; border-radius: 8px; font-size: 13px; outline: none; background: #F9FAFB; transition: border-color 0.2s; }
+    .input-group input:focus, .input-group textarea:focus { border-color: #2563EB; background: #FFFFFF; }
+    
+    .calc-screen { width: 100%; background: #111827; color: #F59E0B; font-size: 34px; font-weight: 900; padding: 18px 14px; border-radius: 12px; text-align: right; margin-bottom: 14px; border: 1px solid #374151; overflow-x: auto; white-space: nowrap; word-break: keep-all; letter-spacing: 1.5px; }
+    .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .calc-btn { padding: 18px 0; font-size: 18px; font-weight: 800; background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 12px; cursor: pointer; color: #1F2937; text-align: center; transition: background 0.1s, transform 0.05s; }
+    .calc-btn:active { background: #E5E7EB; transform: scale(0.96); }
+    .calc-btn.op { background: #FEF3C7; color: #B45309; border-color: #FDE68A; }
+    .calc-btn.eq { background: #059669; color: #FFFFFF; border-color: #047857; grid-row: span 2; height: 100%; display: flex; align-items: center; justify-content: center; }
+    .calc-btn.ac { background: #FEE2E2; color: #DC2626; border-color: #FECACA; }
+    .calc-btn.c-btn { background: #FFEDD5; color: #C2410C; border-color: #FED7AA; }
+    .calc-btn.del { background: #F3F4F6; color: #4B5563; }
+
+    .notes-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .notes-section-title { font-size: 14px; font-weight: 900; color: #111827; display: flex; align-items: center; gap: 6px; }
+    .add-note-btn { background: #2563EB; color: #FFF; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 16px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(37,99,235,0.3); }
+    .note-item-row { background: #FFFBEB; border: 1px solid #FDE68A; padding: 10px 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #111827; }
+    .note-delete-btn { background: none; border: none; color: #DC2626; font-weight: 800; cursor: pointer; font-size: 14px; }
+    
+    .btn-row { display: flex; gap: 6px; margin-top: 8px; }
+    .btn-compact { padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 4px; width: 100%; transition: opacity 0.2s; }
+    .btn-compact:active { opacity: 0.8; }
+    .btn-approve-comp { background: #059669; color: #FFFFFF; box-shadow: 0 2px 6px rgba(5, 150, 105, 0.2); }
+    
+    .studio-header-card { background: #111827; color: #fff; border-radius: 14px; padding: 16px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+    .reel-progress-container, .progress-container { display: none; width: 100%; background: #E5E7EB; border-radius: 8px; overflow: hidden; height: 16px; margin-top: 10px; position: relative; }
+    .reel-progress-fill, .progress-bar-fill { height: 100%; width: 0%; background: #059669; transition: width 0.3s ease; }
+    .progress-bar-fill { background: #2563EB; }
+    .reel-progress-text, .progress-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: #FFFFFF; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+
+    /* Studio Grid Layout (Original as requested) */
+    .reels-grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 14px; }
+    .reel-grid-item { aspect-ratio: 1/1; background: #111827; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; user-select: none; border: 1px solid #E5E7EB; }
+    .reel-grid-item video, .reel-grid-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .media-type-badge { position: absolute; bottom: 4px; right: 4px; background: rgba(0,0,0,0.7); color: #fff; font-size: 9px; padding: 2px 4px; border-radius: 4px; font-weight: 800; }
+
+    .reel-action-sheet { z-index: 999998; align-items: flex-end; }
+    .reel-action-card { background: #FFFFFF; width: 100%; max-width: 480px; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; box-shadow: 0 -10px 30px rgba(0,0,0,0.3); transform: translateY(100%); transition: transform 0.3s ease-out; }
+    .reel-action-sheet.open .reel-action-card { transform: translateY(0); }
+    .action-sheet-title { font-size: 14px; font-weight: 900; color: #111827; margin-bottom: 14px; text-align: center; border-bottom: 1px solid #E5E7EB; padding-bottom: 8px; }
+    .action-sheet-btn { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #E5E7EB; background: #F9FAFB; font-size: 13px; font-weight: 800; color: #1F2937; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.1s; }
+    .action-sheet-btn:active { background: #F3F4F6; }
+    .action-sheet-btn.danger { background: #FEF2F2; color: #DC2626; border-color: #FEE2E2; }
+    .action-sheet-btn.success { background: #ECFDF5; color: #059669; border-color: #A7F3D0; }
+
+    /* 👑 Star Shops Style Premium Card Modal for Full View */
+    .merchant-full-view-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 99999999 !important; display: none; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(6px); }
+    .merchant-full-view-overlay.open { display: flex; }
+    .merchant-full-view-card { background: #FFFFFF; width: 100%; max-width: 380px; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 15px 35px rgba(0,0,0,0.4); position: relative; animation: slideUpModal 0.25s ease-out; }
+    @keyframes slideUpModal { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .custom-popup-card { background: #FFFFFF; width: 90%; max-width: 330px; border-radius: 20px; padding: 22px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.3); position: relative; }
+    
+    .profile-card { text-align: center; position: relative; }
+    .profile-top-action-btn { position: absolute; top: 12px; right: 12px; background: #111827; color: #F59E0B; border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; z-index: 10; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
+    .profile-banner-box { width: 100%; height: 100px; border-radius: 10px; overflow: hidden; margin-bottom: 10px; background: #111827; border: 1px solid #E5E7EB; position: relative; }
+    .profile-banner-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .name-title-text { font-size: 16px; font-weight: 800; color: #111827; margin-top: 6px; }
+    
+    /* Premium SVG Bottom Navigation CSS */
+    .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; width: 100%; height: 60px; background: #FFFFFF; border-top: 1px solid #E5E7EB; display: flex; justify-content: space-around; align-items: center; z-index: 50; box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05); }
+    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 10px; color: #6B7280; cursor: pointer; height: 100%; transition: color 0.3s ease; user-select: none; }
+    .nav-item.active { color: #111827; font-weight: 800; }
+    .nav-item .icon { display: flex; align-items: center; justify-content: center; height: 30px; margin-bottom: 2px; }
+    .nav-item .icon svg { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    
+    .nav-item:not(.active) .icon svg { opacity: 0.4; transform: scale(0.85); filter: grayscale(100%); }
+    .nav-item.active .icon svg { opacity: 1; transform: scale(1.15); filter: sepia(1) saturate(5) hue-rotate(5deg) brightness(1.2) drop-shadow(0 4px 10px rgba(212, 175, 55, 0.6)); }
+    
+    .login-lock-layer { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; background: #FFF; border-radius: 12px; border: 1px solid #E5E7EB; text-align: center; }
+    .login-lock-icon { font-size: 40px; margin-bottom: 10px; }
+    .login-lock-title { font-size: 16px; font-weight: 800; color: #111827; margin-bottom: 6px; }
+    .login-lock-desc { font-size: 12px; color: #6B7280; margin-bottom: 20px; }
+
+    .login-gate-overlay { position: fixed; inset: 0; background: #0b0b0f; z-index: 999997; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; transition: opacity 0.5s ease, visibility 0.5s; }
+    .login-gate-card { background: #16161a; width: 100%; max-width: 360px; padding: 30px 20px; border-radius: 20px; border: 1px solid #27272a; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+    .led-indicator { width: 16px; height: 16px; border-radius: 50%; background: #4B5563; margin: 0 auto 20px auto; box-shadow: 0 0 10px rgba(75, 85, 99, 0.5); transition: all 0.3s ease; }
+    .led-red { background: #DC2626; box-shadow: 0 0 20px #DC2626, inset 0 0 5px #7f1d1d; animation: blinkRed 1s infinite; }
+    .led-green { background: #10B981; box-shadow: 0 0 20px #10B981, inset 0 0 5px #064e3b; }
+    @keyframes blinkRed { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+    .gate-input { width: 100%; padding: 14px; margin-bottom: 15px; background: #1f1f23; border: 1px solid #3f3f46; border-radius: 10px; color: #fff; font-size: 14px; outline: none; }
+    .gate-input:focus { border-color: #F59E0B; }
+    .gate-btn { width: 100%; padding: 14px; background: #F59E0B; color: #0b0b0f; border: none; border-radius: 10px; font-size: 15px; font-weight: 900; cursor: pointer; transition: background 0.2s; margin-top: 10px; }
+    .gate-btn:active { transform: scale(0.98); }
+    .gate-message { margin-top: 15px; font-size: 12px; font-weight: 700; height: 15px; }
+    .msg-red { color: #F87171; }
+    .msg-green { color: #34D399; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- द मेन लॉगिन गेट -->
+  <div class="login-gate-overlay" id="mainLoginGate">
+    <div class="login-gate-card">
+      <div class="led-indicator" id="gateLed"></div>
+      <div style="font-size:22px; font-weight:900; color:#fff; margin-bottom:5px;"><span style="color:#F59E0B;">★</span> STAR SHOP</div>
+      <div style="font-size:12px; color:#9CA3AF; margin-bottom:25px;">मर्चेंट पार्टनर नेटवर्क</div>
+      
+      <input type="text" id="gateMerchantId" class="gate-input" placeholder="मर्चेंट आईडी (Store ID)">
+      <input type="password" id="gateMerchantPin" class="gate-input" placeholder="4-अंकों का पिन" maxlength="4" inputmode="numeric">
+      
+      <button class="gate-btn" id="gateLoginBtn" onclick="attemptGateLogin()">सुरक्षित लॉगिन</button>
+      <div class="gate-message" id="gateMessage"></div>
+      <button onclick="window.open('https://marchent-form2.netlify.app/', '_blank')" style="margin-top: 25px; background: none; border: none; color: #9CA3AF; text-decoration: underline; font-size: 12px; cursor: pointer;">नया मर्चेंट अकाउंट रजिस्टर करें</button>
+    </div>
+  </div>
+
+  <div class="device-shell">
+    <header class="top-header" id="merchantHeader">
+      <div class="brand-title"><span class="star-badge">★</span> STAR MERCHANT</div>
+      <div class="header-right-box">
+        <button class="lang-switch-btn" onclick="toggleLanguage()" id="langSwitchBtn">🌐 HI / EN</button>
+        <div class="header-msg-btn" onclick="openQueryModal()" title="Support">💬</div>
+        <div class="header-msg-btn noti" onclick="toggleNotifications()" title="Notifications">🔔</div>
+      </div>
+    </header>
+
+    <!-- Notifications Sidebar Overlay -->
+    <div class="noti-overlay" id="notiOverlay" onclick="closeNotifications(event)">
+      <div class="noti-sidebar" id="notiSidebar">
+        <div class="noti-header">
+          <div class="noti-title">🔔 नए अलर्ट्स एवं सूचनाएं</div>
+          <button class="noti-close-btn" onclick="toggleNotifications()">×</button>
+        </div>
+        <div class="noti-content" id="dynamicNotificationContent">
+          <div style="font-size:12px; color:#6B7280; text-align:center; padding:10px;">लोड किया जा रहा है...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Home Tab -->
+    <main id="tab-home" class="tab-screen active">
+      <div class="status-card">
+        <div>
+          <div class="status-info-title" id="storeStatusLabel">🔴 स्टोर स्थिति बंद</div>
+          <div class="status-info-sub">कस्टमर ऐप पर लाइव स्थिति दिखाने के लिए टॉगल चालू रखें।</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="storeStatusToggle" onchange="toggleStoreStatus(this)">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">👥 आज कुल विज़िट्स ग्राहकों की</div>
+        <div class="metric-value" id="metricVisitsVal">0 Customers</div>
+        <div class="metric-sub">कस्टमर ऐप से लाइव सिंक हो रहा है!</div>
+      </div>
+      <div class="action-card">
+        <div class="action-card-title">🏷️ स्पेशल डिस्काउंट ऑफर सेट करें</div>
+        <div class="input-group">
+          <label>डिस्काउंट टैग (Discount Tag)</label>
+          <input type="text" id="quickOfferInput" placeholder="जैसे: FLAT ₹150 OFF">
+        </div>
+        <div class="input-group" style="margin-top: 8px;">
+          <label>शर्तें / पैरामीटर्स (Terms & Conditions)</label>
+          <textarea id="offerConditionsInput" rows="4" placeholder="यहाँ अपनी शर्तें विस्तार से लिखें...&#10;जैसे:&#10;1. न्यूनतम खरीदारी ₹500&#10;2. केवल मंगलवार के लिए मान्य" style="resize: vertical; min-height: 90px;"></textarea>
+        </div>
+        <div class="btn-row" style="justify-content: flex-end; margin-top: 10px;">
+          <button class="btn-compact btn-approve-comp" style="width: auto;" onclick="updateMerchantOfferLive()">लाइव ऑफर अपडेट करें</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- 2. Manage Reels & Posts Studio Tab -->
+    <main id="tab-manage-reels" class="tab-screen">
+      <div class="studio-header-card">
+        <div>
+          <div style="font-size:16px; font-weight:900;">🎬 मर्चेंट मीडिया स्टूडियो</div>
+          <div style="font-size:11px; color:#9CA3AF; margin-top:2px;" id="studioSubTitle">लॉगिन करने के बाद यहाँ आपकी रील्स और पोस्ट्स दिखाई देंगी।</div>
+        </div>
+      </div>
+      
+      <div class="studio-upload-box">
+        <div style="font-size:13px; font-weight:800; color:#111827; margin-bottom:8px;">📹 नई रील (वीडियो) अपलोड करें</div>
+        <div class="input-group">
+          <label>रील कैप्शन (Caption)</label>
+          <input type="text" id="uploadReelCaptionInput" placeholder="जैसे: बेस्ट ऑफर & फ्री गिफ्ट!">
+        </div>
+        <input type="file" id="reelVideoFileInput" accept="video/*" style="display: none;" onchange="uploadMediaToSupabaseStorage(event, 'video')">
+        <button type="button" class="btn-compact" onclick="document.getElementById('reelVideoFileInput').click()" style="background: #2563EB; color: #fff; width: 100%;">
+            📁 वीडियो फाइल चुनें और अपलोड करें
+        </button>
+      </div>
+
+      <div class="studio-upload-box" style="margin-top: 10px;">
+        <div style="font-size:13px; font-weight:800; color:#111827; margin-bottom:8px;">🖼️ नई फोटो पोस्ट अपलोड करें</div>
+        <div class="input-group">
+          <label>पोस्ट कैप्शन / विवरण (Caption)</label>
+          <input type="text" id="uploadPostCaptionInput" placeholder="जैसे: नई वैरायटी आ गई है!">
+        </div>
+        <input type="file" id="postImageFileInput" accept="image/*" style="display: none;" onchange="uploadMediaToSupabaseStorage(event, 'image')">
+        <button type="button" class="btn-compact" onclick="document.getElementById('postImageFileInput').click()" style="background: #059669; color: #fff; width: 100%;">
+            📷 फोटो गैलरी से चुनें और पोस्ट करें
+        </button>
+      </div>
+
+      <div class="reel-progress-container" id="reelProgressBarContainer">
+        <div class="reel-progress-fill" id="reelProgressBarFill"></div>
+        <div class="reel-progress-text" id="reelProgressText">0%</div>
+      </div>
+
+      <div style="font-size:13px; font-weight:800; color:#111827; margin-top:14px; margin-bottom:6px;">🎦 रील्स और पोस्ट्स ग्रिड (Long-press to delete)</div>
+      <div class="reels-grid-container" id="merchantReelsGridContainer">
+        <div style="grid-column: span 3; font-size:12px; color:#6B7280; text-align:center; padding:20px;">कृपया पहले प्रोफाइल टैब से लॉगिन करें।</div>
+      </div>
+    </main>
+
+    <!-- 3. Network Tab -->
+    <main id="tab-network" class="tab-screen">
+      <div style="font-size:16px; font-weight:900; color:#111827; margin-bottom:4px;">🤝 B2B मर्चेंट स्टॉक नेटवर्क</div>
+      <div style="font-size:11px; color:#6B7280; margin-bottom:14px;">आसपास के दुकानदारों से सुरक्षित संपर्क करें।</div>
+      <div id="dynamicB2BNetworkContainer">
+        <div style="font-size:12px; color:#6B7280; text-align:center; padding:20px;">लोड हो रहा है...</div>
+      </div>
+    </main>
+
+    <!-- 4. Calculator & Notes Tab -->
+    <main id="tab-calculator" class="tab-screen">
+      <div class="notes-bar-container">
+        <div class="notes-section-header">
+          <div class="notes-section-title">📝 मर्चेंट नोट्स & हिसाब किताब</div>
+          <button class="add-note-btn" onclick="openAddNotePrompt()" title="नया नोट जोड़ें">+</button>
+        </div>
+        <div id="merchantNotesListContainer"></div>
+      </div>
+
+      <div class="calc-container">
+        <div class="calc-screen" id="calcDisplay">0</div>
+        <div class="calc-grid">
+          <button class="calc-btn ac" onclick="calcClear()">AC</button>
+          <button class="calc-btn c-btn" onclick="calcClearSingleEntry()">C</button>
+          <button class="calc-btn del" onclick="calcBackSpace()">⌫</button>
+          <button class="calc-btn op" onclick="calcAppend('/')">÷</button>
+          <button class="calc-btn" onclick="calcAppend('7')">7</button>
+          <button class="calc-btn" onclick="calcAppend('8')">8</button>
+          <button class="calc-btn" onclick="calcAppend('9')">9</button>
+          <button class="calc-btn op" onclick="calcAppend('*')">×</button>
+          <button class="calc-btn" onclick="calcAppend('4')">4</button>
+          <button class="calc-btn" onclick="calcAppend('5')">5</button>
+          <button class="calc-btn" onclick="calcAppend('6')">6</button>
+          <button class="calc-btn op" onclick="calcAppend('-')">-</button>
+          <button class="calc-btn" onclick="calcAppend('1')">1</button>
+          <button class="calc-btn" onclick="calcAppend('2')">2</button>
+          <button class="calc-btn" onclick="calcAppend('3')">3</button>
+          <button class="calc-btn op" onclick="calcAppend('+')">+</button>
+          <button class="calc-btn" onclick="calcAppend('0')">0</button>
+          <button class="calc-btn" onclick="calcAppend('.')">.</button>
+          <button class="calc-btn" onclick="calcClearZero()">00</button>
+          <button class="calc-btn eq" onclick="calcEvaluate()">=</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- 5. Profile Tab -->
+    <main id="tab-profile" class="tab-screen">
+      <div class="profile-card">
+        <button class="profile-top-action-btn" id="profileAuthBtn" onclick="openAuthPrompt()">🔒 Login</button>
+        <div class="profile-banner-box">
+          <img id="merchantBannerDisplay" src="" alt="Store Banner">
+        </div>
+        <div class="progress-container" id="bannerProgressBarContainer">
+          <div class="progress-bar-fill" id="bannerProgressBarFill"></div>
+          <div class="progress-text" id="bannerProgressText">0%</div>
+        </div>
+        <div style="margin-bottom: 14px;">
+          <input type="file" id="bannerUploadInput" accept="image/*" style="display: none;" onchange="uploadAutoFitMerchantBanner(event)">
+          <button type="button" class="btn-compact" id="changeBannerBtn" onclick="document.getElementById('bannerUploadInput').click()" style="background: #2563EB; color: #fff; width: 100%;">
+              🖼 बैनर बदलें (Change Banner)
+          </button>
+        </div>
+        <div class="name-title-text" id="merchantStoreNameDisplay">Store Name (Guest)</div>
+        <div style="font-size:11px; color:#6B7280; margin-top:2px;" id="merchantSubLocDisplay">Delhi</div>
+        
+        <div style="margin-top: 12px; margin-bottom: 14px;">
+          <button type="button" class="btn-compact" onclick="window.open('https://marchent-form2.netlify.app/', '_blank')" style="background: #D97706; color: #fff; width: 100%;">
+              ➕ नई दुकान रजिस्टर करें
+          </button>
+        </div>
+
+        <div style="margin-top: 14px; text-align: left;">
+          <div class="input-group">
+            <label>दुकान का नाम (Store Name)</label>
+            <input type="text" id="editStoreName" disabled value="">
+          </div>
+          <div class="input-group">
+            <label>दुकान का पूरा पता (Address)</label>
+            <input type="text" id="editStoreAddress" disabled value="">
+          </div>
+          <div class="input-group" style="margin-top: 10px;">
+            <label>रजिस्टर्ड फोन (Phone)</label>
+            <input type="text" id="editStorePhone" disabled value="">
+          </div>
+          <div class="btn-row" style="margin-top: 14px;">
+            <button type="button" class="btn-compact" id="editProfileBtn" onclick="toggleEditProfile()" style="background: #4B5563; color: #fff; flex: 1;" disabled>✏ एडिट प्रोफाइल</button>
+            <button type="button" class="btn-compact btn-approve-comp" id="saveProfileBtn" onclick="saveMerchantProfile()" style="flex: 1; display: none;">💾 सेव बदलाव</button>
+          </div>
+          <div class="btn-row" style="margin-top: 10px;">
+             <button type="button" class="btn-compact" id="changePinBtn" onclick="openChangePinPrompt()" style="background: #DC2626; color: #fff; width: 100%; display: none;">🔐 सिक्योरिटी पिन बदलें</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Navigation 3D SVG -->
+    <nav class="bottom-nav">
+      <svg width="0" height="0" style="position:absolute; width:0; height:0;">
+        <defs>
+          <linearGradient id="metal3D" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#F3F4F6"/>
+            <stop offset="25%" stop-color="#9CA3AF"/>
+            <stop offset="50%" stop-color="#4B5563"/>
+            <stop offset="80%" stop-color="#111827"/>
+            <stop offset="100%" stop-color="#374151"/>
+          </linearGradient>
+          <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="3" stdDeviation="2" flood-opacity="0.4"/>
+          </filter>
+        </defs>
+      </svg>
+
+      <!-- 1. होम -->
+      <div class="nav-item active" onclick="switchMerchantTab('home', this)">
+        <div class="icon">
+          <svg width="26" height="26" viewBox="0 0 100 100">
+            <path d="M 50 15 L 15 45 L 20 45 L 20 85 L 80 85 L 80 45 L 85 45 Z" fill="none" stroke="url(#metal3D)" stroke-width="8" stroke-linejoin="round" filter="url(#dropShadow)"/>
+            <rect x="40" y="60" width="20" height="25" fill="url(#metal3D)" filter="url(#dropShadow)"/>
+          </svg>
+        </div>
+        <div>होम</div>
+      </div>
+      
+      <!-- 2. स्टूडियो -->
+      <div class="nav-item" onclick="switchMerchantTab('manage-reels', this)">
+        <div class="icon">
+          <svg width="26" height="26" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="url(#metal3D)" stroke-width="10" filter="url(#dropShadow)"/>
+            <circle cx="50" cy="50" r="22" fill="none" stroke="url(#metal3D)" stroke-width="10" filter="url(#dropShadow)"/>
+            <circle cx="50" cy="50" r="6" fill="url(#metal3D)" filter="url(#dropShadow)"/>
+          </svg>
+        </div>
+        <div>स्टूडियो</div>
+      </div>
+      
+      <!-- 3. नेटवर्क -->
+      <div class="nav-item" onclick="switchMerchantTab('network', this)">
+        <div class="icon">
+          <svg width="26" height="26" viewBox="0 0 100 100">
+            <circle cx="50" cy="25" r="14" fill="url(#metal3D)" filter="url(#dropShadow)"/>
+            <circle cx="25" cy="75" r="14" fill="url(#metal3D)" filter="url(#dropShadow)"/>
+            <circle cx="75" cy="75" r="14" fill="url(#metal3D)" filter="url(#dropShadow)"/>
+            <path d="M 42 38 L 28 62 M 58 38 L 72 62 M 38 75 L 62 75" fill="none" stroke="url(#metal3D)" stroke-width="6" stroke-linecap="round" filter="url(#dropShadow)"/>
+          </svg>
+        </div>
+        <div>नेटवर्क</div>
+      </div>
+      
+      <!-- 4. कैलकुलेटर -->
+      <div class="nav-item" onclick="switchMerchantTab('calculator', this)">
+        <div class="icon">
+          <svg width="26" height="26" viewBox="0 0 100 100">
+            <rect x="20" y="15" width="60" height="70" rx="8" fill="none" stroke="url(#metal3D)" stroke-width="8" filter="url(#dropShadow)"/>
+            <rect x="32" y="30" width="36" height="14" rx="4" fill="url(#metal3D)" filter="url(#dropShadow)"/>
+            <circle cx="35" cy="58" r="5" fill="url(#metal3D)" filter="url(#dropShadow)"/>
+            <circle cx="50" cy="58" r="5" fill="url(#metal3D)" filter="url(#dropShadow)"/>
+            <circle cx="65" cy="58" r="5" fill="url(#metal3D)" filter="url(#dropShadow)"/>
+            <circle cx="35" cy="73" r="5" fill="url(#metal3D)" filter="url(#dropShadow)"/>
+            <circle cx="50" cy="73" r="5" fill="url(#metal3D)" filter="url(#dropShadow)"/>
+            <circle cx="65" cy="73" r="5" fill="url(#metal3D)" filter="url(#dropShadow)"/>
+          </svg>
+        </div>
+        <div>कैलकुलेटर</div>
+      </div>
+
+      <!-- 5. प्रोफ़ाइल -->
+      <div class="nav-item" onclick="switchMerchantTab('profile', this)">
+        <div class="icon">
+          <svg width="26" height="26" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="url(#metal3D)" stroke-width="10" filter="url(#dropShadow)"/>
+            <circle cx="50" cy="35" r="14" fill="url(#metal3D)" filter="url(#dropShadow)"/>
+            <path d="M 22 80 C 22 55, 35 52, 50 52 C 65 52, 78 55, 78 80" fill="url(#metal3D)" filter="url(#dropShadow)"/>
+          </svg>
+        </div>
+        <div>प्रोफाइल</div>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Reel Action Sheet -->
+  <div class="reel-action-sheet" id="reelActionSheet" onclick="closeReelActionSheetOnOutside(event)">
+    <div class="reel-action-card">
+      <div class="action-sheet-title">⚙ मीडिया विकल्प</div>
+      <button class="action-sheet-btn success" onclick="executeMediaAction('fullwatch')"><span>👁️</span> पूरा देखें / प्ले करें</button>
+      <button class="action-sheet-btn" style="background:#EFF6FF; color:#1D4ED8; border-color:#BFDBFE;" onclick="executeMediaAction('edit')"><span>✏️</span> कैप्शन एडिट करें</button>
+      <button class="action-sheet-btn danger" onclick="executeMediaAction('delete')"><span>🗑</span> डिलीट करें</button>
+      <button class="btn-compact" style="background:#E5E7EB; color:#1F2937; margin-top:8px; width:100%; padding:10px;" onclick="closeReelActionSheet()">वापस जाएं (Close)</button>
+    </div>
+  </div>
+
+  <!-- 👑 STAR SHOPS STYLE PREMIUM CARD MODAL FOR FULL VIEW 👑 -->
+  <div class="merchant-full-view-overlay" id="merchantFullViewOverlay" onclick="closeMerchantFullViewModal()">
+    <div class="merchant-full-view-card" onclick="event.stopPropagation()">
+      <div style="position: relative; background: #000; width: 100%; display: flex; justify-content: center; align-items: center;">
+        <button onclick="closeMerchantFullViewModal()" style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); border: 2px solid #fff; color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; font-weight: bold; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; padding: 0;">✕</button>
+        <div id="merchantFullViewMediaContainer" style="width: 100%; max-height: 60vh; background: #000; display: flex; justify-content: center; align-items: center;"></div>
+      </div>
+      <div style="padding: 18px; background: #fff; text-align: left;">
+        <div style="font-size: 15px; font-weight: 900; color: #111827; margin-bottom: 8px;">📝 पोस्ट / रील विवरण</div>
+        <div style="font-size: 13px; font-weight: 700; color: #4B5563; word-break: break-word; white-space: pre-wrap; line-height: 1.6;" id="merchantFullViewCaption"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Popup Overlay -->
+  <div class="custom-popup-overlay" id="customPopupOverlay" onclick="closePopupOnOutsideClick(event)">
+    <div class="custom-popup-card">
+      <button onclick="closeCustomPopup()" style="position: absolute; top: 12px; right: 14px; background: none; border: none; font-size: 24px; font-weight: bold; color: #9CA3AF; cursor: pointer;">✕</button>
+      <div id="popupTitle" style="font-size:16px; font-weight:900; margin-bottom:6px; color:#111827;">शीर्षक</div>
+      <div id="popupMessage" style="font-size:12px; color:#4B5563; margin-bottom:16px;">संदेश यहाँ</div>
+      <div id="popupCustomBody"></div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://gejrzpflcuvlbpedliwq.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_dw9J2AX0nd3SxPrRy9JGCg_YqS8ZfUF';
+    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+    
+    let currentMerchantData = null;
+    let isEditing = false;
+    let merchantNotesArray = JSON.parse(localStorage.getItem('merchant_notes')) || [];
+    let selectedActiveMedia = null;
+    let longPressTimer = null;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderMerchantNotes();
+      document.getElementById('mainLoginGate').style.display = 'flex'; 
+      checkSavedSessionWithGate(); 
+    });
+
+    async function checkSavedSessionWithGate() {
+      const savedMerchantId = localStorage.getItem('merchant_session_id');
+      if (savedMerchantId && supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient.from('merchants').select('*').eq('id', savedMerchantId).single();
+          if (data && !error) { 
+             if (data.status === 'pending') {
+                 document.getElementById('gateLed').className = 'led-indicator led-red';
+                 const msgBox = document.getElementById('gateMessage');
+                 msgBox.className = 'gate-message msg-red';
+                 msgBox.innerText = "🔴 आपकी डिटेल्स अभी चेक की जा रही हैं। कृपया इंतज़ार करें।";
+             } else {
+                 document.getElementById('mainLoginGate').style.display = 'none';
+                 loadMerchantDataIntoApp(data);
+             }
+          } else { resetGate(); }
+        } catch (e) { resetGate(); }
+      } else { resetGate(); }
+    }
+
+    function resetGate() {
+      localStorage.removeItem('merchant_session_id');
+      document.getElementById('gateMerchantId').value = '';
+      document.getElementById('gateMerchantPin').value = '';
+      document.getElementById('gateLed').className = 'led-indicator';
+      document.getElementById('gateMessage').innerText = '';
+      document.getElementById('gateLoginBtn').innerText = 'सुरक्षित लॉगिन';
+    }
+
+    async function attemptGateLogin() {
+      const mId = document.getElementById('gateMerchantId').value.trim();
+      const mPin = document.getElementById('gateMerchantPin').value.trim();
+      const led = document.getElementById('gateLed');
+      const msgBox = document.getElementById('gateMessage');
+      const btn = document.getElementById('gateLoginBtn');
+      
+      if (!mId || !mPin) {
+        msgBox.className = 'gate-message msg-red';
+        msgBox.innerText = "कृपया आईडी और पिन दोनों दर्ज करें।";
+        return;
+      }
+
+      btn.innerText = "डेटा चेक हो रहा है...";
+      led.className = 'led-indicator';
+      msgBox.innerText = "";
+      
+      if (supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient.from('merchants').select('*').eq('id', mId);
+          
+          if (data && data.length > 0) {
+            const merchant = data[0];
+            
+            if(merchant.pin === mPin || (!merchant.pin && mPin === '1234')) {
+              
+              if (merchant.status === 'pending') {
+                 led.className = 'led-indicator led-red';
+                 msgBox.className = 'gate-message msg-red';
+                 msgBox.innerText = "🔴 आपकी डिटेल्स अभी चेक की जा रही हैं। कृपया इंतज़ार करें।";
+                 btn.innerText = "सुरक्षित लॉगिन";
+              } 
+              else {
+                 localStorage.setItem('merchant_session_id', merchant.id);
+
+                 led.className = 'led-indicator led-green';
+                 msgBox.className = 'gate-message msg-green';
+                 msgBox.innerText = "🟢 सक्सेस! डैशबोर्ड खुल रहा है...";
+                 btn.innerText = "लॉगिन सफल!";
+                 
+                 setTimeout(() => {
+                    document.getElementById('mainLoginGate').style.opacity = '0';
+                    setTimeout(() => {
+                       document.getElementById('mainLoginGate').style.display = 'none';
+                       document.getElementById('mainLoginGate').style.opacity = '1';
+                       loadMerchantDataIntoApp(merchant); 
+                    }, 500);
+                 }, 1000);
+              }
+            } else {
+               led.className = 'led-indicator led-red';
+               msgBox.className = 'gate-message msg-red';
+               msgBox.innerText = "❌ गलत पिन! कृपया सही पिन दर्ज करें।";
+               btn.innerText = "सुरक्षित लॉगिन";
+            }
+          } else {
+            led.className = 'led-indicator led-red';
+            msgBox.className = 'gate-message msg-red';
+            msgBox.innerText = "❌ यह मर्चेंट आईडी डेटाबेस में नहीं मिली।";
+            btn.innerText = "सुरक्षित लॉगिन";
+          }
+        } catch (err) {
+          msgBox.innerText = "सर्वर एरर, कृपया फिर से प्रयास करें।";
+          btn.innerText = "सुरक्षित लॉगिन";
+        }
+      }
+    }
+
+    async function fetchB2BNetworkMerchants() {
+      const container = document.getElementById('dynamicB2BNetworkContainer');
+      
+      if (!currentMerchantData) {
+        container.innerHTML = `
+          <div class="login-lock-layer">
+            <div class="login-lock-icon">🔒</div>
+            <div class="login-lock-title">लॉगिन आवश्यक है</div>
+            <div class="login-lock-desc">B2B नेटवर्क और अन्य मर्चेंट्स के नंबर देखने के लिए कृपया पहले अपनी स्टोर आईडी से लॉगिन करें।</div>
+          </div>
+        `;
+        return;
+      }
+
+      if (!supabaseClient) return;
+      container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:20px;">नेटवर्क लोड हो रहा है...</div>`;
+      
+      try {
+        const { data, error } = await supabaseClient.from('merchants').select('*').in('status', ['approved', 'active', 'open']);
+        if (error) throw error;
+        
+        if (!data || data.length === 0) {
+          container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:20px;">अभी नेटवर्क में कोई मर्चेंट नहीं है।</div>`;
+          return;
+        }
+
+        const otherMerchants = data.filter(m => m.id !== currentMerchantData.id);
+
+        if (otherMerchants.length === 0) {
+          container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:20px;">नेटवर्क में अभी केवल आपका स्टोर मौजूद है।</div>`;
+          return;
+        }
+
+        container.innerHTML = otherMerchants.map(m => {
+          let phoneClean = m.phone ? m.phone.replace(/[^0-9]/g, '') : '';
+          let waLink = phoneClean ? `https://wa.me/91${phoneClean}` : '#';
+          let callLink = phoneClean ? `tel:${phoneClean}` : '#';
+          
+          return `
+            <div style="background:#FFF; border:1px solid #E5E7EB; border-radius:12px; padding:14px; margin-bottom:12px; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:45px; height:45px; border-radius:50%; background:#111827; overflow:hidden; border:2px solid #F59E0B;">
+                  <img src="${m.image_url || 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=100'}" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div style="flex:1;">
+                  <div style="font-size:15px; font-weight:900; color:#111827;">${m.store_name || 'स्टार मर्चेंट'}</div>
+                  <div style="font-size:11px; color:#6B7280; margin-top:2px;">📍 ${m.address || 'लोकेशन उपलब्ध नहीं'}</div>
+                </div>
+              </div>
+              <div style="display:flex; gap:10px; margin-top:14px;">
+                <a href="${callLink}" style="flex:1; text-align:center; background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE; padding:10px; border-radius:10px; font-size:13px; font-weight:800; text-decoration:none; display:flex; justify-content:center; gap:6px;">
+                  📞 कॉल
+                </a>
+                <a href="${waLink}" target="_blank" style="flex:1; text-align:center; background:#ECFDF5; color:#059669; border:1px solid #A7F3D0; padding:10px; border-radius:10px; font-size:13px; font-weight:800; text-decoration:none; display:flex; justify-content:center; gap:6px;">
+                  💬 मैसेज
+                </a>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch(err) {
+        container.innerHTML = `<div style="font-size:12px; color:#DC2626; text-align:center; padding:20px;">त्रुटि: ${err.message}</div>`;
+      }
+    }
+
+    function openAuthPrompt() {
+      if (currentMerchantData) {
+        currentMerchantData = null;
+        isEditing = false;
+        resetGate();
+        
+        if (window.OneSignalDeferred) {
+           window.OneSignalDeferred.push(async function(OneSignal) {
+              await OneSignal.logout();
+           });
+        }
+
+        document.getElementById('merchantStoreNameDisplay').innerText = "Store Name (Guest)";
+        document.getElementById('merchantSubLocDisplay').innerText = "Delhi";
+        document.getElementById('editStoreName').value = "";
+        document.getElementById('editStoreAddress').value = "";
+        document.getElementById('editStorePhone').value = "";
+        document.getElementById('editStoreName').disabled = true;
+        document.getElementById('editStoreAddress').disabled = true;
+        document.getElementById('editStorePhone').disabled = true;
+        document.getElementById('editProfileBtn').disabled = true;
+        document.getElementById('saveProfileBtn').style.display = 'none';
+        document.getElementById('changePinBtn').style.display = 'none';
+        document.getElementById('merchantBannerDisplay').src = "";
+        document.getElementById('profileAuthBtn').innerText = "🔒 Login";
+        document.getElementById('merchantReelsGridContainer').innerHTML = `<div style="grid-column: span 3; font-size:12px; color:#6B7280; text-align:center; padding:20px;">कृपया पहले प्रोफाइल टैब से लॉगिन करें।</div>`;
+        document.getElementById('studioSubTitle').innerText = "लॉगिन करने के बाद यहाँ आपकी रील्स और पोस्ट्स दिखाई देंगी।";
+        
+        document.getElementById('mainLoginGate').style.display = 'flex';
+        fetchB2BNetworkMerchants(); 
+      }
+    }
+
+    function openChangePinPrompt() {
+      if(!currentMerchantData) return;
+      const htmlContent = `
+        <div class="input-group" style="margin-top:6px; text-align:left;">
+          <label>नया 4-डिजिट पिन</label>
+          <input type="password" id="newPinInput" placeholder="****" maxlength="4">
+        </div>
+        <button class="btn-compact btn-approve-comp" style="width:100%; margin-top:12px;" onclick="submitPinChange()">पिन अपडेट करें</button>
+      `;
+      showCustomAlert("सिक्योरिटी पिन बदलें", "अपना नया 4 अंकों का गुप्त पिन सेट करें:", htmlContent);
+    }
+
+    async function submitPinChange() {
+      const newPin = document.getElementById('newPinInput').value.trim();
+      if(newPin.length !== 4 || isNaN(newPin)) return showCustomAlert("त्रुटि", "कृपया केवल 4 अंकों का पिन दर्ज करें।");
+      
+      if (supabaseClient && currentMerchantData) {
+        const { error } = await supabaseClient.from('merchants').update({ pin: newPin }).eq('id', currentMerchantData.id);
+        if (!error) {
+          currentMerchantData.pin = newPin;
+          closeCustomPopup();
+          showCustomAlert("सफलता", "नया पिन सफलतापूर्वक सेव हो गया है।");
+        } else { showCustomAlert("त्रुटि", error.message); }
+      }
+    }
+
+    function loadMerchantDataIntoApp(data) {
+      currentMerchantData = data;
+      document.getElementById('merchantStoreNameDisplay').innerText = data.store_name || 'My Store';
+      document.getElementById('merchantSubLocDisplay').innerText = data.address || 'Delhi';
+      document.getElementById('editStoreName').value = data.store_name || '';
+      document.getElementById('editStoreAddress').value = data.address || '';
+      document.getElementById('editStorePhone').value = data.phone || '';
+      document.getElementById('profileAuthBtn').innerText = "🔓 Logout";
+      document.getElementById('editProfileBtn').disabled = false;
+      document.getElementById('changePinBtn').style.display = 'inline-flex';
+      document.getElementById('studioSubTitle').innerText = `मर्चेंट आईडी: ${data.id}`;
+      
+      if (data.image_url) document.getElementById('merchantBannerDisplay').src = data.image_url;
+      if (data.offer_details) {
+        document.getElementById('quickOfferInput').value = data.offer_details.discount || '';
+        document.getElementById('offerConditionsInput').value = data.offer_details.conditions || '';
+      }
+      
+      updateStoreStatusUI(data.status);
+      fetchMerchantMedia(data.id);
+      fetchB2BNetworkMerchants();
+
+      if (window.OneSignalDeferred) {
+         window.OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.login(data.id);
+         });
+      }
+    }
+
+    // Studio Grid (Original Layout Preserved)
+    async function fetchMerchantMedia(merchantId) {
+      const container = document.getElementById('merchantReelsGridContainer');
+      if (!supabaseClient) return;
+      try {
+        const { data, error } = await supabaseClient.from('reels').select('*').eq('merchant_id', merchantId);
+        if (error) throw error;
+        if (!data || data.length === 0) {
+          container.innerHTML = `<div style="grid-column: span 3; font-size:12px; color:#6B7280; text-align:center; padding:20px;">अभी कोई रील या पोस्ट अपलोड नहीं की गई है।</div>`;
+          return;
+        }
+        
+        const sortedData = data.reverse(); 
+
+        container.innerHTML = sortedData.map(item => {
+          let mediaUrl = item.video_url || item.url || item.image_url;
+          let isVideo = item.media_type === 'video' || (!item.media_type && (mediaUrl.includes('.mp4') || mediaUrl.includes('reel')));
+          let pCap = item.caption || item.description || "कैप्शन नहीं दिया गया";
+
+          return `
+            <div class="reel-grid-item" onmousedown="startLongPress(event, '${item.id}', '${isVideo ? 'video' : 'image'}')" ontouchstart="startLongPress(event, '${item.id}', '${isVideo ? 'video' : 'image'}')" onmouseup="cancelLongPress()" ontouchend="cancelLongPress()">
+              ${isVideo ? `<video src="${mediaUrl}#t=0.1" preload="metadata" muted playsinline></video><div class="media-type-badge">🎬 रील</div>` : `<img src="${mediaUrl}" alt="Post"><div class="media-type-badge">🖼️ पोस्ट</div>`}
+            </div>`;
+        }).join('');
+      } catch (err) { console.error("Error fetching media:", err); }
+    }
+
+    async function uploadMediaToSupabaseStorage(event, type) {
+      const file = event.target.files[0];
+      if (!file || !currentMerchantData) return;
+      
+      const caption = type === 'video' ? 
+        (document.getElementById('uploadReelCaptionInput').value.trim() || "विशेष ऑफर") : 
+        (document.getElementById('uploadPostCaptionInput').value.trim() || "नई पोस्ट");
+      
+      const pbContainer = document.getElementById('reelProgressBarContainer');
+      const pbFill = document.getElementById('reelProgressBarFill');
+      const pbText = document.getElementById('reelProgressText');
+      
+      pbContainer.style.display = 'block'; 
+      pbFill.style.width = '50%'; 
+      pbText.innerText = type === 'video' ? 'रील अपलोड हो रही है...' : 'पोस्ट अपलोड हो रही है...';
+
+      const folder = type === 'video' ? 'reels' : 'posts';
+      const cleanId = String(currentMerchantData.id).replace(/[^a-zA-Z0-9]/g, '_');
+      const fileName = `${folder}_${cleanId}_${Date.now()}`;
+
+      try {
+        const { data, error } = await supabaseClient.storage
+          .from(folder)
+          .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+        if (error) { throw error; }
+
+        pbFill.style.width = '100%';
+        pbText.innerText = 'डेटाबेस से जोड़ा जा रहा है...';
+
+        const { data: publicUrlData } = supabaseClient.storage.from(folder).getPublicUrl(fileName);
+        const mediaUrl = publicUrlData.publicUrl;
+
+        const insertData = type === 'video' ? 
+          { merchant_id: currentMerchantData.id, video_url: mediaUrl, caption: caption, media_type: 'video' } : 
+          { merchant_id: currentMerchantData.id, video_url: mediaUrl, caption: caption, media_type: 'image' };
+
+        const { error: dbErr } = await supabaseClient.from('reels').insert([insertData]);
+
+        if (dbErr) {
+          throw dbErr;
+        } else {
+          pbText.innerText = 'सफलता! ग्रिड रिफ्रेश हो रहा है...';
+          setTimeout(() => {
+            pbContainer.style.display = 'none';
+            pbFill.style.width = '0%';
+            if(type === 'video') document.getElementById('uploadReelCaptionInput').value = '';
+            else document.getElementById('uploadPostCaptionInput').value = '';
+            fetchMerchantMedia(currentMerchantData.id); 
+          }, 1000);
+        }
+      } catch (err) {
+        pbContainer.style.display = 'none';
+        showCustomAlert("अपलोड फेल", "फाइल अपलोड नहीं हो सकी: " + err.message);
+      }
+      event.target.value = "";
+    }
+
+    function startLongPress(e, mediaId, mediaType) { selectedActiveMedia = { id: mediaId, type: mediaType }; longPressTimer = setTimeout(() => { document.getElementById('reelActionSheet').classList.add('open'); }, 500); }
+    function cancelLongPress() { clearTimeout(longPressTimer); }
+    function closeReelActionSheet() { document.getElementById('reelActionSheet').classList.remove('open'); }
+    function closeReelActionSheetOnOutside(e) { if(e.target.id === 'reelActionSheet') closeReelActionSheet(); }
+
+    // 👑 Premium Custom Prompt Card (Replaces browser default prompt)
+    function openPremiumEditPrompt(currentCaption, onSaveCallback) {
+      const popupHtml = `
+        <div class="input-group" style="margin-top:6px; text-align:left;">
+          <label style="font-weight:800; color:#111827;">नया कैप्शन दर्ज करें</label>
+          <input type="text" id="customPromptInput" class="gate-input" style="background:#F9FAFB; color:#111; border:1px solid #D1D5DB;" value="${currentCaption || ''}">
+        </div>
+        <div style="display:flex; gap:8px; margin-top:14px;">
+          <button class="btn-compact" style="background:#F3F4F6; color:#111; flex:1;" onclick="closeCustomPopup()">रद्द करें</button>
+          <button class="btn-compact btn-approve-comp" style="flex:1;" onclick="submitCustomPromptValue()">सेव करें</button>
+        </div>
+      `;
+      showCustomAlert("✏️ कैप्शन एडिट करें", "अपने मर्चेंट पोस्ट या रील का नया कैप्शन लिखें:", popupHtml);
+      window._customPromptCallback = onSaveCallback;
+      setTimeout(() => {
+        const inp = document.getElementById('customPromptInput');
+        if(inp) { inp.focus(); inp.select(); }
+      }, 100);
+    }
+
+    window.submitCustomPromptValue = function() {
+      const val = document.getElementById('customPromptInput').value.trim();
+      closeCustomPopup();
+      if (window._customPromptCallback) {
+        window._customPromptCallback(val);
+      }
+    };
+
+    async function executeMediaAction(actionType) {
+      closeReelActionSheet();
+      if(!selectedActiveMedia) return;
+
+      if(actionType === 'delete') {
+        if(confirm("क्या आप वाकई इसे डिलीट करना चाहते हैं?")) {
+          showCustomAlert("प्रोसेसिंग...", "डिलीट किया जा रहा है...");
+          await supabaseClient.from('reels').delete().eq('id', selectedActiveMedia.id);
+          await fetchMerchantMedia(currentMerchantData.id);
+          closeCustomPopup();
+        }
+      } 
+      else if(actionType === 'edit') {
+        const { data } = await supabaseClient.from('reels').select('caption').eq('id', selectedActiveMedia.id).single();
+        const currentCap = data ? data.caption : "";
+
+        openPremiumEditPrompt(currentCap, async (newCaption) => {
+          if(newCaption !== null) {
+            showCustomAlert("⏳ सेव हो रहा है...", "आपका नया कैप्शन अपडेट किया जा रहा है, कृपया प्रतीक्षा करें...");
+            const { error } = await supabaseClient.from('reels').update({ caption: newCaption }).eq('id', selectedActiveMedia.id);
+            if(!error) {
+              await fetchMerchantMedia(currentMerchantData.id);
+              closeCustomPopup();
+              setTimeout(() => showCustomAlert("सफलता ✅", "कैप्शन सफलतापूर्वक अपडेट हो गया है!"), 300);
+            } else {
+              closeCustomPopup();
+              setTimeout(() => showCustomAlert("त्रुटि", error.message), 300);
+            }
+          }
+        });
+      } 
+      else if(actionType === 'fullwatch') {
+        const { data } = await supabaseClient.from('reels').select('*').eq('id', selectedActiveMedia.id).single();
+        if(data) {
+          let mediaUrl = data.video_url || data.url || data.image_url;
+          let pCap = data.caption || data.description || "कैप्शन नहीं दिया गया";
+          let container = document.getElementById('merchantFullViewMediaContainer');
+          
+          if(selectedActiveMedia.type === 'video') {
+            container.innerHTML = `<video src="${mediaUrl}" autoplay loop playsinline style="width: 100%; max-height: 60vh; object-fit: contain; display: block; background: #000;" controls></video>`;
+          } else {
+            container.innerHTML = `<img src="${mediaUrl}" style="width: 100%; max-height: 60vh; object-fit: contain; display: block;">`;
+          }
+          
+          document.getElementById('merchantFullViewCaption').innerText = pCap;
+          document.getElementById('merchantFullViewOverlay').classList.add('open');
+        }
+      }
+    }
+    
+    function closeMerchantFullViewModal() {
+      document.getElementById('merchantFullViewMediaContainer').innerHTML = "";
+      document.getElementById('merchantFullViewOverlay').classList.remove('open');
+    }
+
+    async function updateMerchantOfferLive() {
+      if(!currentMerchantData) return showCustomAlert("त्रुटि", "कृपया पहले लॉगिन करें।");
+      const discount = document.getElementById('quickOfferInput').value.trim();
+      const conditions = document.getElementById('offerConditionsInput').value.trim();
+      
+      const { error } = await supabaseClient.from('merchants').update({ offer_details: { discount, conditions } }).eq('id', currentMerchantData.id);
+      if(!error) { showCustomAlert("सफलता", "आपका लाइव ऑफर कस्टमर ऐप पर अपडेट कर दिया गया है!"); }
+      else { showCustomAlert("त्रुटि", error.message); }
+    }
+
+    function toggleEditProfile() {
+      isEditing = !isEditing;
+      document.getElementById('editStoreName').disabled = !isEditing;
+      document.getElementById('editStoreAddress').disabled = !isEditing;
+      document.getElementById('editStorePhone').disabled = !isEditing;
+      document.getElementById('saveProfileBtn').style.display = isEditing ? 'inline-flex' : 'none';
+      document.getElementById('editProfileBtn').innerText = isEditing ? 'रद्द करें' : '✏️ एडिट प्रोफाइल';
+    }
+
+    async function saveMerchantProfile() {
+      if(!currentMerchantData) return;
+      const newName = document.getElementById('editStoreName').value.trim();
+      const newAddr = document.getElementById('editStoreAddress').value.trim();
+      const newPhone = document.getElementById('editStorePhone').value.trim();
+
+      const { error } = await supabaseClient.from('merchants').update({ store_name: newName, address: newAddr, phone: newPhone }).eq('id', currentMerchantData.id);
+      if(!error) {
+        currentMerchantData.store_name = newName;
+        currentMerchantData.address = newAddr;
+        currentMerchantData.phone = newPhone;
+        document.getElementById('merchantStoreNameDisplay').innerText = newName;
+        document.getElementById('merchantSubLocDisplay').innerText = newAddr || 'Delhi';
+        toggleEditProfile();
+        showCustomAlert("सफलता", "प्रोफाइल सफलतापूर्वक सेव हो गई है!");
+      } else { showCustomAlert("त्रुटि", error.message); }
+    }
+
+    async function uploadAutoFitMerchantBanner(event) {
+      const file = event.target.files[0];
+      if (!file || !currentMerchantData) return;
+      const pbContainer = document.getElementById('bannerProgressBarContainer');
+      const pbFill = document.getElementById('bannerProgressBarFill');
+      const pbText = document.getElementById('bannerProgressBarText');
+      
+      pbContainer.style.display = 'block'; 
+      pbFill.style.width = '50%'; 
+      pbText.innerText = 'बैनर अपलोड हो रहा है...';
+
+      const cleanId = String(currentMerchantData.id).replace(/[^a-zA-Z0-9]/g, '_');
+      const fileName = `banner_${cleanId}_${Date.now()}`;
+
+      try {
+        const { data, error } = await supabaseClient.storage
+          .from('merchants')
+          .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+        if (error) { throw error; }
+
+        pbFill.style.width = '100%'; 
+        pbText.innerText = 'सफलता! प्रोफाइल अपडेट हो रही है...';
+        
+        const { data: publicUrlData } = supabaseClient.storage.from('merchants').getPublicUrl(fileName);
+        const bannerUrl = publicUrlData.publicUrl;
+        
+        await supabaseClient.from('merchants').update({ image_url: bannerUrl }).eq('id', currentMerchantData.id);
+        currentMerchantData.image_url = bannerUrl;
+        document.getElementById('merchantBannerDisplay').src = bannerUrl;
+        
+        setTimeout(() => { pbContainer.style.display = 'none'; pbFill.style.width = '0%'; }, 1000);
+      } catch (err) {
+        pbContainer.style.display = 'none';
+        showCustomAlert("त्रुटि", "बैनर अपलोड नहीं हो सका: " + err.message);
+      }
+      event.target.value = "";
+    }
+
+    function updateStoreStatusUI(status) {
+      const isStoreOpen = (status || '').toLowerCase() === 'approved' || status === 'active' || status === 'open';
+      const toggleEl = document.getElementById('storeStatusToggle');
+      const label = document.getElementById('storeStatusLabel');
+      toggleEl.checked = isStoreOpen;
+      label.innerText = isStoreOpen ? '🟢 स्टोर स्थिति चालू (Live)' : '🔴 स्टोर स्थिति बंद';
+    }
+
+    async function toggleStoreStatus(checkbox) {
+      if (!currentMerchantData) { checkbox.checked = !checkbox.checked; return showCustomAlert("लॉगिन आवश्यक", "कृपया लॉगिन करें।"); }
+      const newStatus = checkbox.checked ? 'approved' : 'closed';
+      updateStoreStatusUI(newStatus);
+      await supabaseClient.from('merchants').update({ status: newStatus }).eq('id', currentMerchantData.id);
+      currentMerchantData.status = newStatus;
+    }
+
+    let calcExpression = "0";
+    function updateCalcDisplay() { document.getElementById('calcDisplay').innerText = calcExpression; }
+    function calcAppend(val) {
+      if (calcExpression === "0" && val !== '.') calcExpression = val;
+      else calcExpression += val;
+      updateCalcDisplay();
+    }
+    function calcClear() { calcExpression = "0"; updateCalcDisplay(); }
+    function calcClearSingleEntry() { calcExpression = calcExpression.length > 1 ? calcExpression.slice(0, -1) : "0"; updateCalcDisplay(); }
+    function calcClearZero() { calcExpression = calcExpression === "0" ? "00" : calcExpression + "00"; updateCalcDisplay(); }
+    function calcBackSpace() { calcClearSingleEntry(); }
+    function calcEvaluate() {
+      try {
+        const sanitized = calcExpression.replace(/[^0-9+\-*/.]/g, '');
+        let result = new Function('return ' + sanitized)();
+        calcExpression = String(result);
+      } catch (e) { calcExpression = "Error"; }
+      updateCalcDisplay();
+      if(calcExpression === "Error") setTimeout(calcClear, 1500);
+    }
+
+    function switchMerchantTab(tabName, clickedEl) {
+      document.querySelectorAll('.tab-screen').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+      clickedEl.classList.add('active');
+      
+      if(tabName === 'network') fetchB2BNetworkMerchants();
+    }
+
+    function showCustomAlert(title, message, customHtml = '') {
+      document.getElementById('popupTitle').innerText = title;
+      document.getElementById('popupMessage').innerText = message;
+      document.getElementById('popupCustomBody').innerHTML = customHtml + `<button class="btn-compact btn-approve-comp" style="width:100%; margin-top:12px;" onclick="closeCustomPopup()">ठीक है (Close)</button>`;
+      document.getElementById('customPopupOverlay').classList.add('open');
+    }
+    
+    function closeCustomPopup() { document.getElementById('customPopupOverlay').classList.remove('open'); }
+    function closePopupOnOutsideClick(e) { if (e.target.id === 'customPopupOverlay') closeCustomPopup(); }
+
+    function renderMerchantNotes() {
+      const container = document.getElementById('merchantNotesListContainer');
+      if (!merchantNotesArray.length) { container.innerHTML = `<div style="font-size:11px; color:#6B7280; text-align:center; padding:6px;">कोई नोट नहीं।</div>`; return; }
+      container.innerHTML = merchantNotesArray.map((n, i) => `
+        <div class="note-item-row">
+          <div><b>📌 ${n.text}</b></div>
+          <button class="note-delete-btn" onclick="deleteMerchantNote(${i})">✕</button>
+        </div>`).join('');
+    }
+    function openAddNotePrompt() {
+      showCustomAlert("नया नोट", "हिसाब दर्ज करें:", `<input type="text" id="newNoteInput" class="input-group" placeholder="जैसे: 200 उधार"><button class="btn-compact btn-approve-comp" onclick="saveNote()">सेव करें</button>`);
+    }
+    function saveNote() {
+      const val = document.getElementById('newNoteInput').value.trim();
+      if(val) { merchantNotesArray.unshift({ text: val }); localStorage.setItem('merchant_notes', JSON.stringify(merchantNotesArray)); renderMerchantNotes(); closeCustomPopup(); }
+    }
+    function deleteMerchantNote(i) { merchantNotesArray.splice(i, 1); localStorage.setItem('merchant_notes', JSON.stringify(merchantNotesArray)); renderMerchantNotes(); }
+
+    async function openQueryModal() {
+      if (!currentMerchantData) return showCustomAlert("लॉगिन आवश्यक", "सपोर्ट टीम से बात करने के लिए कृपया पहले लॉगिन करें।");
+
+      let historyHtml = `<div style="font-size:11px; color:#6B7280; text-align:center; padding:10px;">पुरानी क्वेरीज़ लोड हो रही हैं...</div>`;
+
+      const htmlContent = `
+        <div class="input-group" style="margin-top:10px; text-align:left;">
+          <label>अपनी समस्या या सवाल दर्ज करें</label>
+          <textarea id="merchantQueryInput" rows="3" placeholder="यहाँ टाइप करें..."></textarea>
+        </div>
+        <button class="btn-compact btn-approve-comp" style="width:100%; margin-top:10px;" onclick="submitMerchantQuery()">सपोर्ट को भेजें</button>
+        
+        <div style="margin-top:20px; text-align:left; border-top:1px solid #E5E7EB; padding-top:14px;">
+          <div style="font-size:13px; font-weight:800; color:#111827; margin-bottom:8px;">📥 आपकी सपोर्ट हिस्ट्री:</div>
+          <div id="queryHistoryContainer" style="max-height:180px; overflow-y:auto; background:#F9FAFB; border-radius:8px; padding:8px; border:1px solid #E5E7EB;">
+            ${historyHtml}
+          </div>
+        </div>
+      `;
+      showCustomAlert("मर्चेंट सपोर्ट", "सपोर्ट स्टाफ से सहायता लें:", htmlContent);
+
+      const { data, error } = await supabaseClient
+        .from('merchant_queries')
+        .select('*')
+        .eq('merchant_name', currentMerchantData.store_name)
+        .order('created_at', { ascending: false });
+
+      const container = document.getElementById('queryHistoryContainer');
+      if (container) {
+        if (error || !data || data.length === 0) {
+          container.innerHTML = `<div style="font-size:11px; color:#6B7280; text-align:center; padding:10px;">अभी तक कोई क्वेरी नहीं भेजी गई है।</div>`;
+        } else {
+          container.innerHTML = data.map(q => `
+            <div style="background:#FFF; border:1px solid #D1D5DB; border-radius:8px; padding:10px; margin-bottom:8px; font-size:12px;">
+              <div style="color:#1F2937; font-weight:700;">सवाल: ${q.query_text}</div>
+              <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="color:${q.status === 'Pending' ? '#B45309' : '#059669'}; font-weight:800; background:${q.status === 'Pending' ? '#FEF3C7' : '#D1FAE5'}; padding:3px 8px; border-radius:6px; font-size:10px;">
+                  ${q.status === 'Pending' ? '⏳ पेंडिंग' : '✅ जवाब मिला'}
+                </span>
+              </div>
+              ${q.reply_text ? `<div style="color:#065F46; margin-top:8px; background:#ECFDF5; padding:8px; border-radius:6px; font-weight:600;"><b>एडमिन रिप्लाई:</b> ${q.reply_text}</div>` : ''}
+            </div>
+          `).join('');
+        }
+      }
+    }
+
+    async function submitMerchantQuery() {
+      const queryText = document.getElementById('merchantQueryInput').value.trim();
+      if (!queryText || !currentMerchantData) return showCustomAlert("त्रुटि", "कृपया पहले लॉगिन करें और क्वेरी लिखें।");
+      
+      const { error } = await supabaseClient.from('merchant_queries').insert([{
+        merchant_name: currentMerchantData.store_name,
+        query_text: queryText,
+        status: 'Pending'
+      }]);
+      
+      if (!error) {
+        closeCustomPopup();
+        showCustomAlert("सफलता", "आपकी क्वेरी सपोर्ट टीम को भेज दी गई है!");
+      } else {
+        showCustomAlert("त्रुटि", error.message);
+      }
+    }
+
+    function toggleNotifications() {
+      const overlay = document.getElementById('notiOverlay');
+      if (overlay) {
+        overlay.classList.toggle('open');
+        if (overlay.classList.contains('open')) {
+          fetchNotifications();
+        }
+      }
+    }
+
+    function closeNotifications(e) {
+      if (e.target.id === 'notiOverlay') {
+        document.getElementById('notiOverlay').classList.remove('open');
+      }
+    }
+
+    async function fetchNotifications() {
+      const container = document.getElementById('dynamicNotificationContent');
+      if (!container || !supabaseClient) return;
+      const { data, error } = await supabaseClient.from('alerts').select('*');
+      if (error || !data || data.length === 0) {
+        container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:10px;">कोई नया नोटिफिकेशन नहीं है।</div>`;
+        return;
+      }
+      container.innerHTML = data.map(n => `
+        <div style="background:#FFF; padding:10px; border-radius:8px; margin-bottom:8px; border:1px solid #E5E7EB; font-size:12px;">
+          <b>${n.title || 'सूचना'}</b>
+          <p style="color:#4B5563; margin-top:2px;">${n.message || ''}</p>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>
