@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="100%" height="100%">
+  <defs>
+    <!-- डार्क और ब्राइट गोल्डन ग्रेडिएंट (तेरी इमेज वाले रिंग जैसा) -->
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE066" />    <!-- ब्राइट चमक -->
+      <stop offset="50%" stop-color="#D4AF37" />   <!-- सॉलिड गोल्ड -->
+      <stop offset="100%" stop-color="#8B6508" />  <!-- डार्क गोल्ड/ब्राउन -->
+    </linearGradient>
+
+    <!-- बाहर की तरफ चमकने वाला ग्लो (Glow Filter) -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    
+    <!-- नेटवर्क पिलर्स के लिए 3D ड्रॉप शैडो -->
+    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000" flood-opacity="0.8"/>
+    </filter>
+  </defs>
+
+  <!-- अंदर का डार्क बैकग्राउंड (ताकि गोल्डन रंग उभर कर आए) -->
+  <circle cx="128" cy="128" r="115" fill="#111111" />
+
+  <!-- चमकता हुआ बाहरी गोल्डन रिंग -->
+  <circle cx="128" cy="128" r="115" fill="none" stroke="url(#goldGradient)" stroke-width="8" filter="url(#glow)" />
+  
+  <!-- प्रीमियम लुक के लिए एक पतली अंदरूनी लाइन -->
+  <circle cx="128" cy="128" r="102" fill="none" stroke="url(#goldGradient)" stroke-width="1.5" opacity="0.6" />
+
+  <!-- 3-पिलर नेटवर्क (इस 256x256 बॉक्स के सेंटर में सेट किया हुआ) -->
+  <g filter="url(#dropShadow)">
+    <polygon points="128,65 78,145 178,145" fill="none" stroke="url(#goldGradient)" stroke-width="12" stroke-linejoin="round" />
+    <circle cx="128" cy="65" r="18" fill="url(#goldGradient)" /> 
+    <circle cx="78" cy="145" r="18" fill="url(#goldGradient)" /> 
+    <circle cx="178" cy="145" r="18" fill="url(#goldGradient)" /> 
+  </g>
+
+  <!-- "नेटवर्क" टेक्स्ट -->
+  <text x="128" y="200" font-family="'Arial', sans-serif" font-size="26" font-weight="900" text-anchor="middle" fill="#FFE066" letter-spacing="1.5">नेटवर्क</text>
+</svg>
