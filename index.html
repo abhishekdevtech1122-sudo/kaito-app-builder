@@ -1202,13 +1202,15 @@
         </div>
       `).join('');
     }
-      <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js');
-      });
-    }
-  </script>
+      if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/kaito-app-builder/sw.js')
+        .then(reg => console.log('Service Worker registered successfully!'))
+        .catch(err => console.log('Service Worker registration failed:', err));
+    });
+  }
+</script>
 </body>
 </html>
+
 
