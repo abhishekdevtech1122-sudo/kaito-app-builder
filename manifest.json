@@ -22,13 +22,13 @@
   ],
   "icons": [
     {
-      "src": "./logo-small.png",
+      "src": "https://abhishekdevtech1122-sudo.github.io/kaito-app-builder/logo-small.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./large-logo.png",
+      "src": "https://abhishekdevtech1122-sudo.github.io/kaito-app-builder/large-logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
