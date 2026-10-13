@@ -4,7 +4,10 @@
   "id": "/?source=pwa",
   "start_url": "/?source=pwa",
   "display": "standalone",
-  "display_override": ["standalone", "fullscreen"],
+  "display_override": [
+    "standalone",
+    "fullscreen"
+  ],
   "background_color": "#000000",
   "theme_color": "#D4AF37",
   "description": "Drive local customers directly to your offline store with live tracking and offers.",
@@ -12,35 +15,49 @@
   "dir": "ltr",
   "lang": "en-US",
   "scope": "/",
-  "categories": ["business", "productivity", "shopping"],
+  "categories": [
+    "business",
+    "productivity",
+    "shopping"
+  ],
   "icons": [
     {
       "src": "/logo-small.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/logo-large.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     }
   ],
   "shortcuts": [
     {
       "name": "Add Offer",
       "short_name": "Offer",
-      "description": "Add a new offer to your store",
+      "description": "Add a new offer to your store.",
       "url": "/?action=add_offer",
-      "icons": [{ "src": "/logo-small.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/logo-small.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "View Dashboard",
       "short_name": "Dashboard",
-      "description": "Go to Merchant Dashboard",
+      "description": "Go to Merchant Dashboard.",
       "url": "/?action=dashboard",
-      "icons": [{ "src": "/logo-small.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/logo-small.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ],
   "screenshots": [
@@ -52,11 +69,11 @@
       "label": "Star Merchant Dashboard"
     },
     {
-       "src": "/logo-large.png",
-       "sizes": "512x512",
-       "type": "image/png",
-       "form_factor": "narrow",
-       "label": "Star Merchant Mobile View"
+      "src": "/logo-large.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Star Merchant Mobile View"
     }
   ]
 }
