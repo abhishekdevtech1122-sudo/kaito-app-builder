@@ -1,9 +1,12 @@
-const CACHE_NAME = 'star-merchant-v1';
+const CACHE_NAME = 'star-merchant-v2';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(['./']);
+      return cache.addAll([
+        '/kaito-app-builder/',
+        '/kaito-app-builder/index.html'
+      ]);
     })
   );
 });
