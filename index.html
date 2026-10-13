@@ -96,7 +96,6 @@
     .progress-bar-fill { background: #2563EB; }
     .reel-progress-text, .progress-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: #FFFFFF; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
 
-    /* Studio Grid Layout (Original as requested) */
     .reels-grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 14px; }
     .reel-grid-item { aspect-ratio: 1/1; background: #111827; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; user-select: none; border: 1px solid #E5E7EB; }
     .reel-grid-item video, .reel-grid-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -111,7 +110,6 @@
     .action-sheet-btn.danger { background: #FEF2F2; color: #DC2626; border-color: #FEE2E2; }
     .action-sheet-btn.success { background: #ECFDF5; color: #059669; border-color: #A7F3D0; }
 
-    /* 👑 Star Shops Style Premium Card Modal for Full View */
     .merchant-full-view-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 99999999 !important; display: none; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(6px); }
     .merchant-full-view-overlay.open { display: flex; }
     .merchant-full-view-card { background: #FFFFFF; width: 100%; max-width: 380px; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 15px 35px rgba(0,0,0,0.4); position: relative; animation: slideUpModal 0.25s ease-out; }
@@ -125,7 +123,6 @@
     .profile-banner-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .name-title-text { font-size: 16px; font-weight: 800; color: #111827; margin-top: 6px; }
     
-    /* Premium SVG Bottom Navigation CSS */
     .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; width: 100%; height: 60px; background: #FFFFFF; border-top: 1px solid #E5E7EB; display: flex; justify-content: space-around; align-items: center; z-index: 50; box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05); }
     .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 10px; color: #6B7280; cursor: pointer; height: 100%; transition: color 0.3s ease; user-select: none; }
     .nav-item.active { color: #111827; font-weight: 800; }
@@ -245,9 +242,9 @@
           <label>रील कैप्शन (Caption)</label>
           <input type="text" id="uploadReelCaptionInput" placeholder="जैसे: बेस्ट ऑफर & फ्री गिफ्ट!">
         </div>
-        <input type="file" id="reelVideoFileInput" accept="video/*" style="display: none;" onchange="uploadMediaToSupabaseStorage(event, 'video')">
+        <input type="file" id="reelVideoFileInput" accept="video/*" style="display: none;" onchange="handleMediaSelection(event, 'video')">
         <button type="button" class="btn-compact" onclick="document.getElementById('reelVideoFileInput').click()" style="background: #2563EB; color: #fff; width: 100%;">
-            📁 वीडियो फाइल चुनें और अपलोड करें
+            📁 गैलरी से वीडियो चुनें (Max 30s)
         </button>
       </div>
 
@@ -257,7 +254,7 @@
           <label>पोस्ट कैप्शन / विवरण (Caption)</label>
           <input type="text" id="uploadPostCaptionInput" placeholder="जैसे: नई वैरायटी आ गई है!">
         </div>
-        <input type="file" id="postImageFileInput" accept="image/*" style="display: none;" onchange="uploadMediaToSupabaseStorage(event, 'image')">
+        <input type="file" id="postImageFileInput" accept="image/*" style="display: none;" onchange="handleMediaSelection(event, 'image')">
         <button type="button" class="btn-compact" onclick="document.getElementById('postImageFileInput').click()" style="background: #059669; color: #fff; width: 100%;">
             📷 फोटो गैलरी से चुनें और पोस्ट करें
         </button>
@@ -756,7 +753,6 @@
       }
     }
 
-    // Studio Grid (Original Layout Preserved)
     async function fetchMerchantMedia(merchantId) {
       const container = document.getElementById('merchantReelsGridContainer');
       if (!supabaseClient) return;
@@ -783,10 +779,37 @@
       } catch (err) { console.error("Error fetching media:", err); }
     }
 
-    async function uploadMediaToSupabaseStorage(event, type) {
+    // नया फंक्शन: वीडियो की लंबाई चेक करने के लिए
+    function handleMediaSelection(event, type) {
       const file = event.target.files[0];
       if (!file || !currentMerchantData) return;
-      
+
+      if (type === 'video') {
+        // वीडियो ड्यूरेशन चेक करें
+        const videoElement = document.createElement('video');
+        videoElement.preload = 'metadata';
+        
+        videoElement.onloadedmetadata = function() {
+          window.URL.revokeObjectURL(videoElement.src);
+          // अगर वीडियो 30 सेकंड से बड़ा है
+          if (videoElement.duration > 30) {
+            showCustomAlert("अपलोड फेल ❌", "कृपया 30 सेकंड या उससे कम का वीडियो चुनें। आपकी रील लगभग " + Math.round(videoElement.duration) + " सेकंड की है।");
+            event.target.value = ""; // इनपुट को रीसेट करें
+            return;
+          }
+          // वीडियो सही है, चुपचाप अपलोड प्रक्रिया शुरू करें
+          executeMediaUploadToSupabase(file, type, event);
+        };
+        
+        videoElement.src = URL.createObjectURL(file);
+      } else {
+        // इमेज के लिए सीधा अपलोड शुरू करें
+        executeMediaUploadToSupabase(file, type, event);
+      }
+    }
+
+    // नया फंक्शन: चुपचाप इंटरनेट (डेटाबेस) पर सेव करने का लॉजिक (URL जनरेटर के साथ)
+    async function executeMediaUploadToSupabase(file, type, event) {
       const caption = type === 'video' ? 
         (document.getElementById('uploadReelCaptionInput').value.trim() || "विशेष ऑफर") : 
         (document.getElementById('uploadPostCaptionInput').value.trim() || "नई पोस्ट");
@@ -796,8 +819,8 @@
       const pbText = document.getElementById('reelProgressText');
       
       pbContainer.style.display = 'block'; 
-      pbFill.style.width = '50%'; 
-      pbText.innerText = type === 'video' ? 'रील अपलोड हो रही है...' : 'पोस्ट अपलोड हो रही है...';
+      pbFill.style.width = '40%'; 
+      pbText.innerText = type === 'video' ? 'रील बैकग्राउंड में अपलोड हो रही है...' : 'पोस्ट अपलोड हो रही है...';
 
       const folder = type === 'video' ? 'reels' : 'posts';
       const cleanId = String(currentMerchantData.id).replace(/[^a-zA-Z0-9]/g, '_');
@@ -810,9 +833,10 @@
 
         if (error) { throw error; }
 
-        pbFill.style.width = '100%';
-        pbText.innerText = 'डेटाबेस से जोड़ा जा रहा है...';
+        pbFill.style.width = '80%';
+        pbText.innerText = 'पब्लिक URL जनरेट किया जा रहा है...';
 
+        // चुपचाप URL बनाकर इंटरनेट पर सेव करने का लॉजिक
         const { data: publicUrlData } = supabaseClient.storage.from(folder).getPublicUrl(fileName);
         const mediaUrl = publicUrlData.publicUrl;
 
@@ -825,14 +849,15 @@
         if (dbErr) {
           throw dbErr;
         } else {
-          pbText.innerText = 'सफलता! ग्रिड रिफ्रेश हो रहा है...';
+          pbFill.style.width = '100%';
+          pbText.innerText = 'सफलता! सभी के देखने के लिए लाइव है!';
           setTimeout(() => {
             pbContainer.style.display = 'none';
             pbFill.style.width = '0%';
             if(type === 'video') document.getElementById('uploadReelCaptionInput').value = '';
             else document.getElementById('uploadPostCaptionInput').value = '';
             fetchMerchantMedia(currentMerchantData.id); 
-          }, 1000);
+          }, 1500);
         }
       } catch (err) {
         pbContainer.style.display = 'none';
@@ -846,7 +871,6 @@
     function closeReelActionSheet() { document.getElementById('reelActionSheet').classList.remove('open'); }
     function closeReelActionSheetOnOutside(e) { if(e.target.id === 'reelActionSheet') closeReelActionSheet(); }
 
-    // 👑 Premium Custom Prompt Card (Replaces browser default prompt)
     function openPremiumEditPrompt(currentCaption, onSaveCallback) {
       const popupHtml = `
         <div class="input-group" style="margin-top:6px; text-align:left;">
@@ -971,7 +995,7 @@
       if (!file || !currentMerchantData) return;
       const pbContainer = document.getElementById('bannerProgressBarContainer');
       const pbFill = document.getElementById('bannerProgressBarFill');
-      const pbText = document.getElementById('bannerProgressBarText');
+      const pbText = document.getElementById('bannerProgressText');
       
       pbContainer.style.display = 'block'; 
       pbFill.style.width = '50%'; 
