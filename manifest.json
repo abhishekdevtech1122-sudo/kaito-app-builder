@@ -2,19 +2,19 @@
   "name": "Star Merchant",
   "short_name": "StarMerchant",
   "id": "star-merchant-app",
-  "start_url": "/kaito-app-builder/?source=pwa",
+  "start_url": "/kaito-app-builder/",
+  "scope": "/kaito-app-builder/",
   "display": "standalone",
   "display_override": [
     "standalone",
     "fullscreen"
   ],
   "background_color": "#000000",
-  "theme_color": "#D4AF37",
+  "theme_color": "#04AF57",
   "description": "Drive local customers directly to your offline store with live tracking and offers.",
   "orientation": "portrait",
   "dir": "ltr",
   "lang": "en-US",
-  "scope": "/kaito-app-builder/",
   "categories": [
     "business",
     "productivity",
@@ -32,54 +32,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    },
-    {
-      "src": "https://abhishekdevtech1122-sudo.github.io/kaito-app-builder/logo-large.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Add Offer",
-      "short_name": "Offer",
-      "description": "Add a new offer to your store.",
-      "url": "/kaito-app-builder/?action=add_offer",
-      "icons": [
-        {
-          "src": "https://abhishekdevtech1122-sudo.github.io/kaito-app-builder/logo-small.png",
-          "sizes": "192x192"
-        }
-      ]
-    },
-    {
-      "name": "View Dashboard",
-      "short_name": "Dashboard",
-      "description": "Go to Merchant Dashboard.",
-      "url": "/kaito-app-builder/?action=dashboard",
-      "icons": [
-        {
-          "src": "https://abhishekdevtech1122-sudo.github.io/kaito-app-builder/logo-small.png",
-          "sizes": "192x192"
-        }
-      ]
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "https://abhishekdevtech1122-sudo.github.io/kaito-app-builder/logo-large.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Star Merchant Dashboard"
-    },
-    {
-      "src": "https://abhishekdevtech1122-sudo.github.io/kaito-app-builder/logo-large.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Star Merchant Mobile View"
     }
   ]
 }
