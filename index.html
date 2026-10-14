@@ -2,12 +2,52 @@
 <html lang="hi" id="htmlRoot">
 <head>
   <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Star Merchant - Secure Dashboard</title>
+
+  <!-- 🚨 STEP 0: ANTI-DESKTOP HARDWARE LOCK WITH FOUNDER GOD-MODE BYPASS 🚨 -->
+  <script>
+    (function enforceHardwareFortress() {
+      // फाउंडर मास्टर बायपास: लोकल फाइल, मोबाइल प्रिव्यू या URL में #abhishek / ?founder=19821 होने पर हमेशा खुलेगा
+      const isLocalEnv = window.location.protocol === 'file:' || 
+                         window.location.hostname === 'localhost' || 
+                         window.location.hostname === '127.0.0.1' || 
+                         window.location.pathname.includes('/storage/emulated/');
+      const hasFounderKey = window.location.hash === '#abhishek' || window.location.search.includes('founder=19821');
+
+      if (hasFounderKey) {
+        sessionStorage.setItem('founder_god_mode', 'active');
+      }
+      if (isLocalEnv || sessionStorage.getItem('founder_god_mode') === 'active') {
+        return; // फाउंडर के लिए पूर्ण एक्सेस
+      }
+
+      const ua = navigator.userAgent || '';
+      const platform = navigator.platform || '';
+      const isDesktopOS = /Win32|Win64|MacIntel|Macintosh|Linux x86_64|X11|CrOS/i.test(platform) || /Windows NT|Macintosh|X11/i.test(ua);
+      const isMobileUA = /Android|iPhone|iPod|iPad/i.test(ua);
+      const hasPhysicalTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+      if (isDesktopOS || !isMobileUA || !hasPhysicalTouch || navigator.webdriver) {
+        window.stop();
+        document.documentElement.innerHTML = `
+          <head><title>Restricted</title></head>
+          <body style="margin:0;padding:20px;background:#0b0b0f;color:#EF4444;height:100vh;width:100vw;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:sans-serif;text-align:center;user-select:none;">
+            <div style="font-size:48px;margin-bottom:12px;">🔒</div>
+            <div style="font-size:18px;font-weight:900;color:#FFF;">केवल मोबाइल डिवाइस पर उपलब्ध</div>
+            <div style="font-size:13px;color:#9CA3AF;margin-top:6px;">Star Merchant Dashboard is strictly locked to authorized mobile devices.</div>
+          </body>
+        `;
+        window.fetch = function() { return Promise.reject('Hardware Locked'); };
+        throw new Error('Desktop Access Denied');
+      }
+    })();
+  </script>
+
   <link rel="manifest" href="manifest.json">
   <!-- OneSignal SDK (Push Notification Engine) -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -24,7 +64,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     body { background-color: #E5E7EB; display: flex; justify-content: center; overflow-x: hidden; }
     
-    .device-shell { width: 100%; max-width: 480px; min-height: 100vh; background-color: #F8F9FA; position: relative; display: flex; flex-direction: column; padding-bottom: 75px; box-shadow: 0 0 20px rgba(0,0,0,0.1); background-clip: padding-box; }
+    .device-shell { width: 100%; max-width: 480px; min-height: 100vh; background-color: #F8F9FA; position: relative; display: flex; flex-direction: column; padding-bottom: 80px; box-shadow: 0 0 20px rgba(0,0,0,0.1); background-clip: padding-box; }
     
     .top-header { background-color: #FFFFFF; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E9ECEF; position: sticky; top: 0; z-index: 40; width: 100%; }
     .brand-title { font-size: 16px; font-weight: 900; letter-spacing: 0.5px; color: #111827; display: flex; align-items: center; gap: 5px; user-select: none; }
@@ -32,7 +72,8 @@
     .header-right-box { display: flex; align-items: center; gap: 8px; }
     .header-msg-btn { width: 36px; height: 36px; background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; position: relative; }
     .header-msg-btn.noti::after { content: ''; position: absolute; top: 6px; right: 8px; width: 8px; height: 8px; background: #EF4444; border-radius: 50%; border: 2px solid #fff; }
-    .lang-switch-btn { background: #FEF3C7; border: 1px solid #FDE68A; padding: 4px 8px; border-radius: 10px; color: #B45309; font-size: 11px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+    .lang-switch-btn { background: #FEF3C7; border: 1px solid #FDE68A; padding: 5px 10px; border-radius: 10px; color: #B45309; font-size: 11px; font-weight: 900; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: transform 0.1s; }
+    .lang-switch-btn:active { transform: scale(0.95); }
 
     .noti-overlay, .reel-action-sheet, .custom-popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; opacity: 0; transition: opacity 0.3s; justify-content: center; align-items: center; }
     .custom-popup-overlay { z-index: 999998; } 
@@ -54,7 +95,7 @@
     .status-info-title { font-size: 13px; font-weight: 800; color: #111827; }
     .status-info-sub { font-size: 10px; color: #6B7280; margin-top: 2px; }
     
-    .switch { position: relative; display: inline-block; width: 46px; height: 24px; }
+    .switch { position: relative; display: inline-block; width: 46px; height: 24px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; inset: 0; background-color: #E5E7EB; transition: .2s; border-radius: 24px; }
     .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
@@ -126,7 +167,8 @@
     .profile-banner-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .name-title-text { font-size: 16px; font-weight: 800; color: #111827; margin-top: 6px; }
     
-    .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; width: 100%; height: 60px; background: #FFFFFF; border-top: 1px solid #E5E7EB; display: flex; justify-content: space-around; align-items: center; z-index: 50; box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05); }
+    /* 🔒 ROCK-SOLID FIXED BOTTOM NAVIGATION (कभी ऊपर नहीं खिसकेगा और कभी गायब नहीं होगा) */
+    .bottom-nav { position: fixed !important; bottom: 0 !important; left: 50% !important; transform: translateX(-50%) !important; width: 100% !important; max-width: 480px !important; height: 62px !important; background: #FFFFFF !important; border-top: 1px solid #E5E7EB !important; display: flex !important; justify-content: space-around !important; align-items: center !important; z-index: 9999 !important; box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06); }
     .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 10px; color: #6B7280; cursor: pointer; height: 100%; transition: color 0.3s ease; user-select: none; }
     .nav-item.active { color: #111827; font-weight: 800; }
     .nav-item .icon { display: flex; align-items: center; justify-content: center; height: 30px; margin-bottom: 2px; }
@@ -165,8 +207,8 @@
       <div style="font-size:22px; font-weight:900; color:#fff; margin-bottom:5px;"><span style="color:#F59E0B;">★</span> STAR SHOP</div>
       <div style="font-size:12px; color:#9CA3AF; margin-bottom:25px;">मर्चेंट पार्टनर नेटवर्क</div>
       
-      <input type="text" id="gateMerchantId" class="gate-input" placeholder="मर्चेंट आईडी (Store ID)">
-      <input type="password" id="gateMerchantPin" class="gate-input" placeholder="4-अंकों का पिन" maxlength="4" inputmode="numeric">
+      <input type="text" id="gateMerchantId" class="gate-input" placeholder="मर्चेंट आईडी (Store ID)" autocomplete="off">
+      <input type="password" id="gateMerchantPin" class="gate-input" placeholder="4-अंकों का पिन" maxlength="4" inputmode="numeric" autocomplete="off">
       
       <button class="gate-btn" id="gateLoginBtn" onclick="attemptGateLogin()">सुरक्षित लॉगिन</button>
       <div class="gate-message" id="gateMessage"></div>
@@ -174,21 +216,37 @@
     </div>
   </div>
 
+  <!-- 3D Metallic SVG Definitions -->
+  <svg width="0" height="0" style="position:absolute; width:0; height:0; pointer-events:none;">
+    <defs>
+      <linearGradient id="metal3D" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#F3F4F6"/>
+        <stop offset="25%" stop-color="#9CA3AF"/>
+        <stop offset="50%" stop-color="#4B5563"/>
+        <stop offset="80%" stop-color="#111827"/>
+        <stop offset="100%" stop-color="#374151"/>
+      </linearGradient>
+      <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="3" stdDeviation="2" flood-opacity="0.4"/>
+      </filter>
+    </defs>
+  </svg>
+
   <div class="device-shell">
     <header class="top-header" id="merchantHeader">
       <div class="brand-title"><span class="star-badge">★</span> STAR MERCHANT</div>
       <div class="header-right-box">
-        <button class="lang-switch-btn" onclick="toggleLanguage()" id="langSwitchBtn">🌐 HI / EN</button>
+        <button class="lang-switch-btn" onclick="toggleLanguage()" id="langSwitchBtn">🌐 EN</button>
         <div class="header-msg-btn" onclick="openQueryModal()" title="Support">💬</div>
-        <div class="header-msg-btn noti" onclick="toggleNotifications()" title="Notifications">🔔</div>
+        <div class="header-msg-btn noti" onclick="toggleNotifications()" title="Merchant Queries">🔔</div>
       </div>
     </header>
 
-    <!-- Notifications Sidebar Overlay -->
+    <!-- Notifications Sidebar Overlay (केवल मर्चेंट सपोर्ट क्वेरीज़ और रिप्लाई) -->
     <div class="noti-overlay" id="notiOverlay" onclick="closeNotifications(event)">
       <div class="noti-sidebar" id="notiSidebar">
         <div class="noti-header">
-          <div class="noti-title">🔔 नए अलर्ट्स एवं सूचनाएं</div>
+          <div class="noti-title">🔔 आपकी सपोर्ट क्वेरीज़</div>
           <button class="noti-close-btn" onclick="toggleNotifications()">×</button>
         </div>
         <div class="noti-content" id="dynamicNotificationContent">
@@ -245,7 +303,7 @@
           <label>रील कैप्शन (Caption)</label>
           <input type="text" id="uploadReelCaptionInput" placeholder="जैसे: बेस्ट ऑफर & फ्री गिफ्ट!">
         </div>
-        <input type="file" id="reelVideoFileInput" accept="video/*" style="display: none;" onchange="handleMediaSelection(event, 'video')">
+        <input type="file" id="reelVideoFileInput" accept="video/mp4,video/webm,video/*" style="display: none;" onchange="handleMediaSelection(event, 'video')">
         <button type="button" class="btn-compact" onclick="document.getElementById('reelVideoFileInput').click()" style="background: #2563EB; color: #fff; width: 100%;">
             📁 गैलरी से वीडियो चुनें (Max 30s)
         </button>
@@ -257,7 +315,7 @@
           <label>पोस्ट कैप्शन / विवरण (Caption)</label>
           <input type="text" id="uploadPostCaptionInput" placeholder="जैसे: नई वैरायटी आ गई है!">
         </div>
-        <input type="file" id="postImageFileInput" accept="image/*" style="display: none;" onchange="handleMediaSelection(event, 'image')">
+        <input type="file" id="postImageFileInput" accept="image/jpeg,image/png,image/webp,image/*" style="display: none;" onchange="handleMediaSelection(event, 'image')">
         <button type="button" class="btn-compact" onclick="document.getElementById('postImageFileInput').click()" style="background: #059669; color: #fff; width: 100%;">
             📷 फोटो गैलरी से चुनें और पोस्ट करें
         </button>
@@ -370,23 +428,8 @@
       </div>
     </main>
 
-    <!-- Bottom Navigation 3D SVG -->
+    <!-- Bottom Navigation 3D SVG (Fixed & Locked at Bottom) -->
     <nav class="bottom-nav">
-      <svg width="0" height="0" style="position:absolute; width:0; height:0;">
-        <defs>
-          <linearGradient id="metal3D" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#F3F4F6"/>
-            <stop offset="25%" stop-color="#9CA3AF"/>
-            <stop offset="50%" stop-color="#4B5563"/>
-            <stop offset="80%" stop-color="#111827"/>
-            <stop offset="100%" stop-color="#374151"/>
-          </linearGradient>
-          <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="3" stdDeviation="2" flood-opacity="0.4"/>
-          </filter>
-        </defs>
-      </svg>
-
       <!-- 1. होम -->
       <div class="nav-item active" onclick="switchMerchantTab('home', this)">
         <div class="icon">
@@ -496,27 +539,295 @@
     
     let currentMerchantData = null;
     let isEditing = false;
+    let currentLang = localStorage.getItem('star_merchant_lang') || 'hi';
     let merchantNotesArray = JSON.parse(localStorage.getItem('merchant_notes')) || [];
     let selectedActiveMedia = null;
     let longPressTimer = null;
 
+    // 🥷 INVISIBLE PIN VAULT (मर्चेंट से सिर्फ 1 बार लॉगिन पर पिन लेगा, अंदर बार-बार कभी नहीं पूछेगा) 🥷
+    function saveSilentPinToVault(pin) {
+      try {
+        const encoded = btoa(String(pin));
+        sessionStorage.setItem('_star_vault_key', encoded);
+        localStorage.setItem('_star_vault_key', encoded);
+      } catch (e) {}
+    }
+
+    function getSilentPinFromVault() {
+      try {
+        const encoded = sessionStorage.getItem('_star_vault_key') || localStorage.getItem('_star_vault_key');
+        return encoded ? atob(encoded) : '';
+      } catch (e) { return ''; }
+    }
+
+    function clearSilentPinVault() {
+      sessionStorage.removeItem('_star_vault_key');
+      localStorage.removeItem('_star_vault_key');
+    }
+
+    // Dual-Engine Secure Backend Action (RPC + Direct Pin-Locked Fallback)
+    async function executeSilentSecureUpdate(actionType, updateColumns) {
+      if (!currentMerchantData || !supabaseClient) return { error: { message: 'Unauthorized' } };
+      const silentPin = getSilentPinFromVault();
+      if (!silentPin) return { error: { message: 'Session Expired' } };
+
+      // 1. पहले सर्वर-साइड RPC को ट्राई करें (यदि SQL फंक्शन मौजूद हो)
+      try {
+        const { data: rpcData, error: rpcErr } = await supabaseClient.rpc('secure_merchant_action', {
+          p_action: actionType,
+          p_id: String(currentMerchantData.id),
+          p_pin: silentPin,
+          p_payload: updateColumns
+        });
+        if (!rpcErr && rpcData && rpcData.success) {
+          return { error: null };
+        }
+      } catch (e) {}
+
+      // 2. Smart Fallback: डेटाबेस क्वेरी में ही .eq('pin', silentPin) का ताला लगाकर अपडेट करें
+      const { error } = await supabaseClient
+        .from('merchants')
+        .update(updateColumns)
+        .eq('id', currentMerchantData.id)
+        .eq('pin', silentPin);
+      return { error };
+    }
+
+    // 🌐 100% COMPLETE BILINGUAL DICTIONARY MATRIX (HI ⇄ EN) 🌐
+    const HI_TO_EN_MAP = {
+      "मर्चेंट पार्टनर नेटवर्क": "Merchant Partner Network",
+      "मर्चेंट आईडी (Store ID)": "Merchant ID (Store ID)",
+      "4-अंकों का पिन": "4-Digit Security PIN",
+      "सुरक्षित लॉगिन": "Secure Login",
+      "नया मर्चेंट अकाउंट रजिस्टर करें": "Register New Merchant Account",
+      "कृपया सही आईडी और 4-अंकों का पिन दर्ज करें।": "Please enter a valid Store ID and 4-digit PIN.",
+      "डेटा चेक हो रहा है...": "Verifying credentials...",
+      "🔴 आपकी डिटेल्स अभी चेक की जा रही हैं। कृपया इंतज़ार करें।": "🔴 Your account is under verification. Please wait.",
+      "🟢 सक्सेस! डैशबोर्ड खुल रहा है...": "🟢 Success! Opening dashboard...",
+      "लॉगिन सफल!": "Login Successful!",
+      "❌ गलत मर्चेंट आईडी या पिन!": "❌ Invalid Merchant ID or PIN!",
+      "सर्वर एरर, कृपया फिर से प्रयास करें।": "Server error, please try again.",
+      "🔔 आपकी सपोर्ट क्वेरीज़": "🔔 Your Support Queries",
+      "लोड किया जा रहा है...": "Loading...",
+      "अपनी क्वेरीज़ और सपोर्ट रिप्लाई देखने के लिए कृपया पहले लॉगिन करें।": "Please login first to view your support queries and replies.",
+      "आपकी कोई सपोर्ट क्वेरी या नया अलर्ट नहीं है।": "You have no support queries or new alerts.",
+      "🔴 स्टोर स्थिति बंद": "🔴 Store Status Closed",
+      "🟢 स्टोर स्थिति चालू (Live)": "🟢 Store Status Open (Live)",
+      "कस्टमर ऐप पर लाइव स्थिति दिखाने के लिए टॉगल चालू रखें।": "Keep the toggle ON to show your store LIVE on the Customer App.",
+      "👥 आज कुल विज़िट्स ग्राहकों की": "👥 Total Customer Visits Today",
+      "कस्टमर ऐप से लाइव सिंक हो रहा है!": "Syncing live with the Customer App!",
+      "🏷️ स्पेशल डिस्काउंट ऑफर सेट करें": "🏷️ Set Special Discount Offer",
+      "डिस्काउंट टैग (Discount Tag)": "Discount Tag",
+      "जैसे: FLAT ₹150 OFF": "e.g., FLAT ₹150 OFF",
+      "शर्तें / पैरामीटर्स (Terms & Conditions)": "Terms & Conditions",
+      "यहाँ अपनी शर्तें विस्तार से लिखें...\nजैसे:\n1. न्यूनतम खरीदारी ₹500\n2. केवल मंगलवार के लिए मान्य": "Write your terms in detail here...\ne.g.:\n1. Minimum purchase ₹500\n2. Valid on Tuesdays only",
+      "लाइव ऑफर अपडेट करें": "Update Live Offer",
+      "🎬 मर्चेंट मीडिया स्टूडियो": "🎬 Merchant Media Studio",
+      "लॉगिन करने के बाद यहाँ आपकी रील्स और पोस्ट्स दिखाई देंगी।": "Your uploaded reels and posts will appear here after login.",
+      "📹 नई रील (वीडियो) अपलोड करें": "📹 Upload New Reel (Video)",
+      "रील कैप्शन (Caption)": "Reel Caption",
+      "जैसे: बेस्ट ऑफर & फ्री गिफ्ट!": "e.g., Best Offer & Free Gift!",
+      "📁 गैलरी से वीडियो चुनें (Max 30s)": "📁 Select Video from Gallery (Max 30s)",
+      "🖼️ नई फोटो पोस्ट अपलोड करें": "🖼️ Upload New Photo Post",
+      "पोस्ट कैप्शन / विवरण (Caption)": "Post Caption / Description",
+      "जैसे: नई वैरायटी आ गई है!": "e.g., New collection has arrived!",
+      "📷 फोटो गैलरी से चुनें और पोस्ट करें": "📷 Select Photo from Gallery & Post",
+      "🎦 रील्स और पोस्ट्स ग्रिड (Long-press to delete)": "🎦 Reels & Posts Grid (Long-press for options)",
+      "कृपया पहले प्रोफाइल टैब से लॉगिन करें।": "Please login from the Profile tab first.",
+      "अभी कोई रील या पोस्ट अपलोड नहीं की गई है।": "No reels or posts uploaded yet.",
+      "🎬 रील": "🎬 Reel",
+      "🖼️ पोस्ट": "🖼️ Post",
+      "रील बैकग्राउंड में अपलोड हो रही है...": "Uploading reel in background...",
+      "पोस्ट अपलोड हो रही है...": "Uploading post...",
+      "पब्लिक URL जनरेट किया जा रहा है...": "Generating public URL...",
+      "सफलता! सभी के देखने के लिए लाइव है!": "Success! Now live for everyone!",
+      "🤝 B2B मर्चेंट स्टॉक नेटवर्क": "🤝 B2B Merchant Stock Network",
+      "आसपास के दुकानदारों से सुरक्षित संपर्क करें।": "Connect securely with nearby merchants.",
+      "लोड हो रहा है...": "Loading...",
+      "लॉगिन आवश्यक है": "Login Required",
+      "B2B नेटवर्क और अन्य मर्चेंट्स के नंबर देखने के लिए कृपया पहले अपनी स्टोर आईडी से लॉगिन करें।": "Please login with your Store ID first to view the B2B network and merchant contacts.",
+      "नेटवर्क लोड हो रहा है...": "Loading network...",
+      "अभी नेटवर्क में कोई मर्चेंट नहीं है।": "No merchants available in the network right now.",
+      "नेटवर्क में अभी केवल आपका स्टोर मौजूद है।": "Only your store is currently in the network.",
+      "स्टार मर्चेंट": "Star Merchant",
+      "लोकेशन उपलब्ध नहीं": "Location not available",
+      "📞 कॉल": "📞 Call",
+      "💬 मैसेज": "💬 Message",
+      "📝 मर्चेंट नोट्स & हिसाब किताब": "📝 Merchant Notes & Ledger",
+      "नया नोट जोड़ें": "Add New Note",
+      "कोई नोट नहीं।": "No notes added yet.",
+      "नया नोट": "New Note",
+      "हिसाब दर्ज करें:": "Enter note or ledger entry:",
+      "जैसे: 200 उधार": "e.g., ₹200 credit",
+      "सेव करें": "Save",
+      "🖼 बैनर बदलें (Change Banner)": "🖼 Change Store Banner",
+      "➕ नई दुकान रजिस्टर करें": "➕ Register a New Store",
+      "दुकान का नाम (Store Name)": "Store Name",
+      "दुकान का पूरा पता (Address)": "Complete Store Address",
+      "रजिस्टर्ड फोन (Phone)": "Registered Phone",
+      "✏ एडिट प्रोफाइल": "✏ Edit Profile",
+      "✏️ एडिट प्रोफाइल": "✏️ Edit Profile",
+      "रद्द करें": "Cancel",
+      "💾 सेव बदलाव": "💾 Save Changes",
+      "🔐 सिक्योरिटी पिन बदलें": "🔐 Change Security PIN",
+      "सिक्योरिटी पिन बदलें": "Change Security PIN",
+      "अपना नया 4 अंकों का गुप्त पिन सेट करें:": "Set your new 4-digit secret PIN:",
+      "नया 4-डिजिट पिन": "New 4-Digit PIN",
+      "पिन अपडेट करें": "Update PIN",
+      "बैनर अपलोड हो रहा है...": "Uploading banner...",
+      "सफलता! प्रोफाइल अपडेट हो रही है...": "Success! Updating profile...",
+      "होम": "Home",
+      "स्टूडियो": "Studio",
+      "नेटवर्क": "Network",
+      "कैलकुलेटर": "Calculator",
+      "प्रोफाइल": "Profile",
+      "⚙ मीडिया विकल्प": "⚙ Media Options",
+      "पूरा देखें / प्ले करें": "Watch Full / Play",
+      "कैप्शन एडिट करें": "Edit Caption",
+      "डिलीट करें": "Delete",
+      "वापस जाएं (Close)": "Go Back (Close)",
+      "📝 पोस्ट / रील विवरण": "📝 Post / Reel Description",
+      "कैप्शन नहीं दिया गया": "No caption provided",
+      "ठीक है (Close)": "OK (Close)",
+      "✏️ कैप्शन एडिट करें": "✏️ Edit Caption",
+      "अपने मर्चेंट पोस्ट या रील का नया कैप्शन लिखें:": "Enter a new caption for your post or reel:",
+      "नया कैप्शन दर्ज करें": "Enter New Caption",
+      "मर्चेंट सपोर्ट": "Merchant Support",
+      "सपोर्ट स्टाफ से सहायता लें:": "Get help from our support staff:",
+      "अपनी समस्या या सवाल दर्ज करें": "Describe your issue or question",
+      "यहाँ टाइप करें...": "Type here...",
+      "सपोर्ट को भेजें": "Send to Support",
+      "📥 आपकी सपोर्ट हिस्ट्री:": "📥 Your Support History:",
+      "पुरानी क्वेरीज़ लोड हो रही हैं...": "Loading previous queries...",
+      "अभी तक कोई क्वेरी नहीं भेजी गई है।": "No queries have been sent yet.",
+      "⏳ पेंडिंग": "⏳ Pending",
+      "✅ जवाब मिला": "✅ Replied",
+      "सपोर्ट रिप्लाई:": "Support Reply:",
+      "त्रुटि": "Error",
+      "सफलता": "Success",
+      "सफलता ✅": "Success ✅",
+      "लॉगिन आवश्यक": "Login Required",
+      "कृपया लॉगिन करें।": "Please login first.",
+      "कृपया पहले लॉगिन करें।": "Please login first.",
+      "सपोर्ट टीम से बात करने के लिए कृपया पहले लॉगिन करें।": "Please login first to contact the support team.",
+      "कृपया पहले लॉगिन करें और क्वेरी लिखें।": "Please login first and enter your query.",
+      "आपकी क्वेरी सपोर्ट टीम को भेज दी गई है!": "Your query has been sent to the support team!",
+      "आपका लाइव ऑफर कस्टमर ऐप पर अपडेट कर दिया गया है!": "Your live offer has been updated on the Customer App!",
+      "प्रोफाइल सफलतापूर्वक सेव हो गई है!": "Profile saved successfully!",
+      "नया पिन सफलतापूर्वक सेव हो गया है।": "New PIN saved successfully.",
+      "कृपया केवल 4 अंकों का पिन दर्ज करें।": "Please enter a valid 4-digit numeric PIN.",
+      "कैप्शन सफलतापूर्वक अपडेट हो गया है!": "Caption updated successfully!",
+      "⏳ सेव हो रहा है...": "⏳ Saving...",
+      "आपका नया कैप्शन अपडेट किया जा रहा है, कृपया प्रतीक्षा करें...": "Updating your caption, please wait...",
+      "प्रोसेसिंग...": "Processing...",
+      "डिलीट किया जा रहा है...": "Deleting media...",
+      "अपलोड फेल ❌": "Upload Failed ❌",
+      "अपलोड फेल": "Upload Failed",
+      "वीडियो फाइल 20MB से कम होनी चाहिए।": "Video file must be under 20MB.",
+      "फोटो 5MB से कम होनी चाहिए।": "Photo file must be under 5MB.",
+      "विशेष ऑफर": "Special Offer",
+      "नई पोस्ट": "New Post"
+    };
+
+    const EN_TO_HI_MAP = {};
+    Object.keys(HI_TO_EN_MAP).forEach(hiKey => {
+      EN_TO_HI_MAP[HI_TO_EN_MAP[hiKey]] = hiKey;
+    });
+
+    function t(text) {
+      if (!text) return text;
+      const str = String(text).trim();
+      if (currentLang === 'en') {
+        if (HI_TO_EN_MAP[str]) return HI_TO_EN_MAP[str];
+        if (str.startsWith("मर्चेंट आईडी:")) return str.replace("मर्चेंट आईडी:", "Merchant ID:");
+        if (str.startsWith("💬 सवाल:")) return str.replace("💬 सवाल:", "💬 Question:");
+        if (str.startsWith("त्रुटि:")) return str.replace("त्रुटि:", "Error:");
+        if (str.startsWith("फाइल अपलोड नहीं हो सकी:")) return str.replace("फाइल अपलोड नहीं हो सकी:", "File upload failed:");
+        if (str.startsWith("बैनर अपलोड नहीं हो सका:")) return str.replace("बैनर अपलोड नहीं हो सका:", "Banner upload failed:");
+        return text;
+      } else {
+        if (EN_TO_HI_MAP[str]) return EN_TO_HI_MAP[str];
+        if (str.startsWith("Merchant ID:")) return str.replace("Merchant ID:", "मर्चेंट आईडी:");
+        if (str.startsWith("💬 Question:")) return str.replace("💬 Question:", "💬 सवाल:");
+        if (str.startsWith("Error:")) return str.replace("Error:", "त्रुटि:");
+        if (str.startsWith("File upload failed:")) return str.replace("File upload failed:", "फाइल अपलोड नहीं हो सकी:");
+        if (str.startsWith("Banner upload failed:")) return str.replace("Banner upload failed:", "बैनर अपलोड नहीं हो सका:");
+        return text;
+      }
+    }
+
+    function applyLanguageToEntireDOM() {
+      document.documentElement.lang = currentLang;
+      const langBtn = document.getElementById('langSwitchBtn');
+      if (langBtn) {
+        langBtn.innerText = currentLang === 'hi' ? '🌐 EN' : '🌐 हिंदी';
+      }
+
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+      let node;
+      while ((node = walker.nextNode())) {
+        const parentTag = node.parentNode ? node.parentNode.tagName : '';
+        if (parentTag === 'SCRIPT' || parentTag === 'STYLE') continue;
+        const raw = node.nodeValue;
+        const trimmed = raw.trim();
+        if (!trimmed) continue;
+
+        const translated = t(trimmed);
+        if (translated !== trimmed) {
+          node.nodeValue = raw.replace(trimmed, translated);
+        }
+      }
+
+      document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(el => {
+        const ph = el.getAttribute('placeholder');
+        if (ph) el.setAttribute('placeholder', t(ph));
+      });
+      document.querySelectorAll('[title]').forEach(el => {
+        const ti = el.getAttribute('title');
+        if (ti) el.setAttribute('title', t(ti));
+      });
+    }
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'hi' ? 'en' : 'hi';
+      localStorage.setItem('star_merchant_lang', currentLang);
+      applyLanguageToEntireDOM();
+      if (currentMerchantData) {
+        updateStoreStatusUI(currentMerchantData.status);
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/[&<>"']/g, function(m) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m];
+      });
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
+      applyLanguageToEntireDOM();
       renderMerchantNotes();
       document.getElementById('mainLoginGate').style.display = 'flex'; 
       checkSavedSessionWithGate(); 
     });
 
+    // ऑटो-सेशन चेक: यदि मर्चेंट ने एक बार लॉगिन कर लिया है तो पिन तिजोरी से ऑटो-वेरीफाई होगा
     async function checkSavedSessionWithGate() {
       const savedMerchantId = localStorage.getItem('merchant_session_id');
-      if (savedMerchantId && supabaseClient) {
+      const silentPin = getSilentPinFromVault();
+      if (savedMerchantId && silentPin && supabaseClient) {
         try {
-          const { data, error } = await supabaseClient.from('merchants').select('*').eq('id', savedMerchantId).single();
+          const { data, error } = await supabaseClient
+            .from('merchants')
+            .select('id, store_name, address, phone, image_url, status, offer_details, customers')
+            .eq('id', savedMerchantId)
+            .eq('pin', silentPin)
+            .single();
           if (data && !error) { 
              if (data.status === 'pending') {
                  document.getElementById('gateLed').className = 'led-indicator led-red';
                  const msgBox = document.getElementById('gateMessage');
                  msgBox.className = 'gate-message msg-red';
-                 msgBox.innerText = "🔴 आपकी डिटेल्स अभी चेक की जा रही हैं। कृपया इंतज़ार करें।";
+                 msgBox.innerText = t("🔴 आपकी डिटेल्स अभी चेक की जा रही हैं। कृपया इंतज़ार करें।");
              } else {
                  document.getElementById('mainLoginGate').style.display = 'none';
                  loadMerchantDataIntoApp(data);
@@ -528,11 +839,12 @@
 
     function resetGate() {
       localStorage.removeItem('merchant_session_id');
+      clearSilentPinVault();
       document.getElementById('gateMerchantId').value = '';
       document.getElementById('gateMerchantPin').value = '';
       document.getElementById('gateLed').className = 'led-indicator';
       document.getElementById('gateMessage').innerText = '';
-      document.getElementById('gateLoginBtn').innerText = 'सुरक्षित लॉगिन';
+      document.getElementById('gateLoginBtn').innerText = t('सुरक्षित लॉगिन');
     }
 
     async function attemptGateLogin() {
@@ -542,63 +854,60 @@
       const msgBox = document.getElementById('gateMessage');
       const btn = document.getElementById('gateLoginBtn');
       
-      if (!mId || !mPin) {
+      if (!mId || !mPin || mPin.length !== 4) {
         msgBox.className = 'gate-message msg-red';
-        msgBox.innerText = "कृपया आईडी और पिन दोनों दर्ज करें।";
+        msgBox.innerText = t("कृपया सही आईडी और 4-अंकों का पिन दर्ज करें।");
         return;
       }
 
-      btn.innerText = "डेटा चेक हो रहा है...";
+      btn.innerText = t("डेटा चेक हो रहा है...");
       led.className = 'led-indicator';
       msgBox.innerText = "";
       
       if (supabaseClient) {
         try {
-          const { data, error } = await supabaseClient.from('merchants').select('*').eq('id', mId);
+          const { data, error } = await supabaseClient
+            .from('merchants')
+            .select('id, store_name, address, phone, image_url, status, offer_details, customers')
+            .eq('id', mId)
+            .eq('pin', mPin);
           
-          if (data && data.length > 0) {
+          if (!error && data && data.length > 0) {
             const merchant = data[0];
             
-            if(merchant.pin === mPin || (!merchant.pin && mPin === '1234')) {
-              
-              if (merchant.status === 'pending') {
-                 led.className = 'led-indicator led-red';
-                 msgBox.className = 'gate-message msg-red';
-                 msgBox.innerText = "🔴 आपकी डिटेल्स अभी चेक की जा रही हैं। कृपया इंतज़ार करें।";
-                 btn.innerText = "सुरक्षित लॉगिन";
-              } 
-              else {
-                 localStorage.setItem('merchant_session_id', merchant.id);
-
-                 led.className = 'led-indicator led-green';
-                 msgBox.className = 'gate-message msg-green';
-                 msgBox.innerText = "🟢 सक्सेस! डैशबोर्ड खुल रहा है...";
-                 btn.innerText = "लॉगिन सफल!";
-                 
-                 setTimeout(() => {
-                    document.getElementById('mainLoginGate').style.opacity = '0';
-                    setTimeout(() => {
-                       document.getElementById('mainLoginGate').style.display = 'none';
-                       document.getElementById('mainLoginGate').style.opacity = '1';
-                       loadMerchantDataIntoApp(merchant); 
-                    }, 500);
-                 }, 1000);
-              }
-            } else {
+            if (merchant.status === 'pending') {
                led.className = 'led-indicator led-red';
                msgBox.className = 'gate-message msg-red';
-               msgBox.innerText = "❌ गलत पिन! कृपया सही पिन दर्ज करें।";
-               btn.innerText = "सुरक्षित लॉगिन";
+               msgBox.innerText = t("🔴 आपकी डिटेल्स अभी चेक की जा रही हैं। कृपया इंतज़ार करें।");
+               btn.innerText = t("सुरक्षित लॉगिन");
+            } 
+            else {
+               localStorage.setItem('merchant_session_id', merchant.id);
+               saveSilentPinToVault(mPin); // 🥷 पिन को साइलेंट तिजोरी में लॉक कर लिया गया!
+
+               led.className = 'led-indicator led-green';
+               msgBox.className = 'gate-message msg-green';
+               msgBox.innerText = t("🟢 सक्सेस! डैशबोर्ड खुल रहा है...");
+               btn.innerText = t("लॉगिन सफल!");
+               
+               setTimeout(() => {
+                  document.getElementById('mainLoginGate').style.opacity = '0';
+                  setTimeout(() => {
+                     document.getElementById('mainLoginGate').style.display = 'none';
+                     document.getElementById('mainLoginGate').style.opacity = '1';
+                     loadMerchantDataIntoApp(merchant); 
+                  }, 500);
+               }, 800);
             }
           } else {
-            led.className = 'led-indicator led-red';
-            msgBox.className = 'gate-message msg-red';
-            msgBox.innerText = "❌ यह मर्चेंट आईडी डेटाबेस में नहीं मिली।";
-            btn.innerText = "सुरक्षित लॉगिन";
+             led.className = 'led-indicator led-red';
+             msgBox.className = 'gate-message msg-red';
+             msgBox.innerText = t("❌ गलत मर्चेंट आईडी या पिन!");
+             btn.innerText = t("सुरक्षित लॉगिन");
           }
         } catch (err) {
-          msgBox.innerText = "सर्वर एरर, कृपया फिर से प्रयास करें।";
-          btn.innerText = "सुरक्षित लॉगिन";
+          msgBox.innerText = t("सर्वर एरर, कृपया फिर से प्रयास करें।");
+          btn.innerText = t("सुरक्षित लॉगिन");
         }
       }
     }
@@ -610,29 +919,32 @@
         container.innerHTML = `
           <div class="login-lock-layer">
             <div class="login-lock-icon">🔒</div>
-            <div class="login-lock-title">लॉगिन आवश्यक है</div>
-            <div class="login-lock-desc">B2B नेटवर्क और अन्य मर्चेंट्स के नंबर देखने के लिए कृपया पहले अपनी स्टोर आईडी से लॉगिन करें।</div>
+            <div class="login-lock-title">${t("लॉगिन आवश्यक है")}</div>
+            <div class="login-lock-desc">${t("B2B नेटवर्क और अन्य मर्चेंट्स के नंबर देखने के लिए कृपया पहले अपनी स्टोर आईडी से लॉगिन करें।")}</div>
           </div>
         `;
         return;
       }
 
       if (!supabaseClient) return;
-      container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:20px;">नेटवर्क लोड हो रहा है...</div>`;
+      container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:20px;">${t("नेटवर्क लोड हो रहा है...")}</div>`;
       
       try {
-        const { data, error } = await supabaseClient.from('merchants').select('*').in('status', ['approved', 'active', 'open']);
+        const { data, error } = await supabaseClient
+          .from('merchants')
+          .select('id, store_name, address, phone, image_url, status')
+          .in('status', ['approved', 'active', 'open']);
         if (error) throw error;
         
         if (!data || data.length === 0) {
-          container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:20px;">अभी नेटवर्क में कोई मर्चेंट नहीं है।</div>`;
+          container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:20px;">${t("अभी नेटवर्क में कोई मर्चेंट नहीं है।")}</div>`;
           return;
         }
 
         const otherMerchants = data.filter(m => m.id !== currentMerchantData.id);
 
         if (otherMerchants.length === 0) {
-          container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:20px;">नेटवर्क में अभी केवल आपका स्टोर मौजूद है।</div>`;
+          container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:20px;">${t("नेटवर्क में अभी केवल आपका स्टोर मौजूद है।")}</div>`;
           return;
         }
 
@@ -645,26 +957,26 @@
             <div style="background:#FFF; border:1px solid #E5E7EB; border-radius:12px; padding:14px; margin-bottom:12px; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
               <div style="display:flex; align-items:center; gap:12px;">
                 <div style="width:45px; height:45px; border-radius:50%; background:#111827; overflow:hidden; border:2px solid #F59E0B;">
-                  <img src="${m.image_url || 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=100'}" style="width:100%; height:100%; object-fit:cover;">
+                  <img src="${escapeHtml(m.image_url || 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=100')}" style="width:100%; height:100%; object-fit:cover;">
                 </div>
                 <div style="flex:1;">
-                  <div style="font-size:15px; font-weight:900; color:#111827;">${m.store_name || 'स्टार मर्चेंट'}</div>
-                  <div style="font-size:11px; color:#6B7280; margin-top:2px;">📍 ${m.address || 'लोकेशन उपलब्ध नहीं'}</div>
+                  <div style="font-size:15px; font-weight:900; color:#111827;">${escapeHtml(m.store_name || t('स्टार मर्चेंट'))}</div>
+                  <div style="font-size:11px; color:#6B7280; margin-top:2px;">📍 ${escapeHtml(m.address || t('लोकेशन उपलब्ध नहीं'))}</div>
                 </div>
               </div>
               <div style="display:flex; gap:10px; margin-top:14px;">
                 <a href="${callLink}" style="flex:1; text-align:center; background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE; padding:10px; border-radius:10px; font-size:13px; font-weight:800; text-decoration:none; display:flex; justify-content:center; gap:6px;">
-                  📞 कॉल
+                  ${t("📞 कॉल")}
                 </a>
                 <a href="${waLink}" target="_blank" style="flex:1; text-align:center; background:#ECFDF5; color:#059669; border:1px solid #A7F3D0; padding:10px; border-radius:10px; font-size:13px; font-weight:800; text-decoration:none; display:flex; justify-content:center; gap:6px;">
-                  💬 मैसेज
+                  ${t("💬 मैसेज")}
                 </a>
               </div>
             </div>
           `;
         }).join('');
       } catch(err) {
-        container.innerHTML = `<div style="font-size:12px; color:#DC2626; text-align:center; padding:20px;">त्रुटि: ${err.message}</div>`;
+        container.innerHTML = `<div style="font-size:12px; color:#DC2626; text-align:center; padding:20px;">${t("त्रुटि:")} ${escapeHtml(err.message)}</div>`;
       }
     }
 
@@ -693,8 +1005,8 @@
         document.getElementById('changePinBtn').style.display = 'none';
         document.getElementById('merchantBannerDisplay').src = "";
         document.getElementById('profileAuthBtn').innerText = "🔒 Login";
-        document.getElementById('merchantReelsGridContainer').innerHTML = `<div style="grid-column: span 3; font-size:12px; color:#6B7280; text-align:center; padding:20px;">कृपया पहले प्रोफाइल टैब से लॉगिन करें।</div>`;
-        document.getElementById('studioSubTitle').innerText = "लॉगिन करने के बाद यहाँ आपकी रील्स और पोस्ट्स दिखाई देंगी।";
+        document.getElementById('merchantReelsGridContainer').innerHTML = `<div style="grid-column: span 3; font-size:12px; color:#6B7280; text-align:center; padding:20px;">${t("कृपया पहले प्रोफाइल टैब से लॉगिन करें।")}</div>`;
+        document.getElementById('studioSubTitle').innerText = t("लॉगिन करने के बाद यहाँ आपकी रील्स और पोस्ट्स दिखाई देंगी।");
         
         document.getElementById('mainLoginGate').style.display = 'flex';
         fetchB2BNetworkMerchants(); 
@@ -705,25 +1017,25 @@
       if(!currentMerchantData) return;
       const htmlContent = `
         <div class="input-group" style="margin-top:6px; text-align:left;">
-          <label>नया 4-डिजिट पिन</label>
-          <input type="password" id="newPinInput" placeholder="****" maxlength="4">
+          <label>${t("नया 4-डिजिट पिन")}</label>
+          <input type="password" id="newPinInput" placeholder="****" maxlength="4" inputmode="numeric">
         </div>
-        <button class="btn-compact btn-approve-comp" style="width:100%; margin-top:12px;" onclick="submitPinChange()">पिन अपडेट करें</button>
+        <button class="btn-compact btn-approve-comp" style="width:100%; margin-top:12px;" onclick="submitPinChange()">${t("पिन अपडेट करें")}</button>
       `;
-      showCustomAlert("सिक्योरिटी पिन बदलें", "अपना नया 4 अंकों का गुप्त पिन सेट करें:", htmlContent);
+      showCustomAlert(t("सिक्योरिटी पिन बदलें"), t("अपना नया 4 अंकों का गुप्त पिन सेट करें:"), htmlContent);
     }
 
     async function submitPinChange() {
       const newPin = document.getElementById('newPinInput').value.trim();
-      if(newPin.length !== 4 || isNaN(newPin)) return showCustomAlert("त्रुटि", "कृपया केवल 4 अंकों का पिन दर्ज करें।");
+      if(newPin.length !== 4 || isNaN(newPin)) return showCustomAlert(t("त्रुटि"), t("कृपया केवल 4 अंकों का पिन दर्ज करें।"));
       
       if (supabaseClient && currentMerchantData) {
-        const { error } = await supabaseClient.from('merchants').update({ pin: newPin }).eq('id', currentMerchantData.id);
+        const { error } = await executeSilentSecureUpdate('change_pin', { pin: newPin, new_pin: newPin });
         if (!error) {
-          currentMerchantData.pin = newPin;
+          saveSilentPinToVault(newPin); // नया पिन तिजोरी में अपडेट
           closeCustomPopup();
-          showCustomAlert("सफलता", "नया पिन सफलतापूर्वक सेव हो गया है।");
-        } else { showCustomAlert("त्रुटि", error.message); }
+          showCustomAlert(t("सफलता"), t("नया पिन सफलतापूर्वक सेव हो गया है।"));
+        } else { showCustomAlert(t("त्रुटि"), error.message); }
       }
     }
 
@@ -737,7 +1049,8 @@
       document.getElementById('profileAuthBtn').innerText = "🔓 Logout";
       document.getElementById('editProfileBtn').disabled = false;
       document.getElementById('changePinBtn').style.display = 'inline-flex';
-      document.getElementById('studioSubTitle').innerText = `मर्चेंट आईडी: ${data.id}`;
+      document.getElementById('studioSubTitle').innerText = t(`मर्चेंट आईडी: ${data.id}`);
+      document.getElementById('metricVisitsVal').innerText = `${data.customers || 0} Customers`;
       
       if (data.image_url) document.getElementById('merchantBannerDisplay').src = data.image_url;
       if (data.offer_details) {
@@ -751,7 +1064,7 @@
 
       if (window.OneSignalDeferred) {
          window.OneSignalDeferred.push(async function(OneSignal) {
-            await OneSignal.login(data.id);
+            await OneSignal.login(String(data.id));
          });
       }
     }
@@ -763,59 +1076,69 @@
         const { data, error } = await supabaseClient.from('reels').select('*').eq('merchant_id', merchantId);
         if (error) throw error;
         if (!data || data.length === 0) {
-          container.innerHTML = `<div style="grid-column: span 3; font-size:12px; color:#6B7280; text-align:center; padding:20px;">अभी कोई रील या पोस्ट अपलोड नहीं की गई है।</div>`;
+          container.innerHTML = `<div style="grid-column: span 3; font-size:12px; color:#6B7280; text-align:center; padding:20px;">${t("अभी कोई रील या पोस्ट अपलोड नहीं की गई है।")}</div>`;
           return;
         }
         
         const sortedData = data.reverse(); 
 
         container.innerHTML = sortedData.map(item => {
-          let mediaUrl = item.video_url || item.url || item.image_url;
+          let mediaUrl = item.video_url || item.url || item.image_url || '';
           let isVideo = item.media_type === 'video' || (!item.media_type && (mediaUrl.includes('.mp4') || mediaUrl.includes('reel')));
-          let pCap = item.caption || item.description || "कैप्शन नहीं दिया गया";
 
           return `
             <div class="reel-grid-item" onmousedown="startLongPress(event, '${item.id}', '${isVideo ? 'video' : 'image'}')" ontouchstart="startLongPress(event, '${item.id}', '${isVideo ? 'video' : 'image'}')" onmouseup="cancelLongPress()" ontouchend="cancelLongPress()">
-              ${isVideo ? `<video src="${mediaUrl}#t=0.1" preload="metadata" muted playsinline></video><div class="media-type-badge">🎬 रील</div>` : `<img src="${mediaUrl}" alt="Post"><div class="media-type-badge">🖼️ पोस्ट</div>`}
+              ${isVideo ? `<video src="${encodeURI(mediaUrl)}#t=0.1" preload="metadata" muted playsinline></video><div class="media-type-badge">${t("🎬 रील")}</div>` : `<img src="${encodeURI(mediaUrl)}" alt="Post"><div class="media-type-badge">${t("🖼️ पोस्ट")}</div>`}
             </div>`;
         }).join('');
       } catch (err) { console.error("Error fetching media:", err); }
     }
 
-    // नया फंक्शन: वीडियो की लंबाई चेक करने के लिए
     function handleMediaSelection(event, type) {
       const file = event.target.files[0];
       if (!file || !currentMerchantData) return;
 
+      if (type === 'video' && file.size > 20 * 1024 * 1024) {
+        showCustomAlert(t("अपलोड फेल ❌"), t("वीडियो फाइल 20MB से कम होनी चाहिए।"));
+        event.target.value = "";
+        return;
+      }
+      if (type === 'image' && file.size > 5 * 1024 * 1024) {
+        showCustomAlert(t("अपलोड फेल ❌"), t("फोटो 5MB से कम होनी चाहिए।"));
+        event.target.value = "";
+        return;
+      }
+
       if (type === 'video') {
-        // वीडियो ड्यूरेशन चेक करें
         const videoElement = document.createElement('video');
         videoElement.preload = 'metadata';
         
         videoElement.onloadedmetadata = function() {
           window.URL.revokeObjectURL(videoElement.src);
-          // अगर वीडियो 30 सेकंड से बड़ा है
           if (videoElement.duration > 30) {
-            showCustomAlert("अपलोड फेल ❌", "कृपया 30 सेकंड या उससे कम का वीडियो चुनें। आपकी रील लगभग " + Math.round(videoElement.duration) + " सेकंड की है।");
-            event.target.value = ""; // इनपुट को रीसेट करें
+            const msg = currentLang === 'en' 
+              ? `Please select a video of 30 seconds or less. Your reel is approx ${Math.round(videoElement.duration)} seconds.`
+              : `कृपया 30 सेकंड या उससे कम का वीडियो चुनें। आपकी रील लगभग ${Math.round(videoElement.duration)} सेकंड की है।`;
+            showCustomAlert(t("अपलोड फेल ❌"), msg);
+            event.target.value = "";
             return;
           }
-          // वीडियो सही है, चुपचाप अपलोड प्रक्रिया शुरू करें
           executeMediaUploadToSupabase(file, type, event);
         };
         
         videoElement.src = URL.createObjectURL(file);
       } else {
-        // इमेज के लिए सीधा अपलोड शुरू करें
         executeMediaUploadToSupabase(file, type, event);
       }
     }
 
-    // नया फंक्शन: चुपचाप इंटरनेट (डेटाबेस) पर सेव करने का लॉजिक (URL जनरेटर के साथ)
+    // मर्चेंट बिना पिन डाले सीधा वीडियो/फोटो अपलोड करेगा (Silent Vault Auth Active)
     async function executeMediaUploadToSupabase(file, type, event) {
+      if (!getSilentPinFromVault()) return showCustomAlert(t("त्रुटि"), t("कृपया पहले लॉगिन करें।"));
+
       const caption = type === 'video' ? 
-        (document.getElementById('uploadReelCaptionInput').value.trim() || "विशेष ऑफर") : 
-        (document.getElementById('uploadPostCaptionInput').value.trim() || "नई पोस्ट");
+        (document.getElementById('uploadReelCaptionInput').value.trim() || t("विशेष ऑफर")) : 
+        (document.getElementById('uploadPostCaptionInput').value.trim() || t("नई पोस्ट"));
       
       const pbContainer = document.getElementById('reelProgressBarContainer');
       const pbFill = document.getElementById('reelProgressBarFill');
@@ -823,7 +1146,7 @@
       
       pbContainer.style.display = 'block'; 
       pbFill.style.width = '40%'; 
-      pbText.innerText = type === 'video' ? 'रील बैकग्राउंड में अपलोड हो रही है...' : 'पोस्ट अपलोड हो रही है...';
+      pbText.innerText = type === 'video' ? t('रील बैकग्राउंड में अपलोड हो रही है...') : t('पोस्ट अपलोड हो रही है...');
 
       const folder = type === 'video' ? 'reels' : 'posts';
       const cleanId = String(currentMerchantData.id).replace(/[^a-zA-Z0-9]/g, '_');
@@ -837,9 +1160,8 @@
         if (error) { throw error; }
 
         pbFill.style.width = '80%';
-        pbText.innerText = 'पब्लिक URL जनरेट किया जा रहा है...';
+        pbText.innerText = t('पब्लिक URL जनरेट किया जा रहा है...');
 
-        // चुपचाप URL बनाकर इंटरनेट पर सेव करने का लॉजिक
         const { data: publicUrlData } = supabaseClient.storage.from(folder).getPublicUrl(fileName);
         const mediaUrl = publicUrlData.publicUrl;
 
@@ -853,7 +1175,7 @@
           throw dbErr;
         } else {
           pbFill.style.width = '100%';
-          pbText.innerText = 'सफलता! सभी के देखने के लिए लाइव है!';
+          pbText.innerText = t('सफलता! सभी के देखने के लिए लाइव है!');
           setTimeout(() => {
             pbContainer.style.display = 'none';
             pbFill.style.width = '0%';
@@ -864,7 +1186,7 @@
         }
       } catch (err) {
         pbContainer.style.display = 'none';
-        showCustomAlert("अपलोड फेल", "फाइल अपलोड नहीं हो सकी: " + err.message);
+        showCustomAlert(t("अपलोड फेल"), t("फाइल अपलोड नहीं हो सकी:") + " " + err.message);
       }
       event.target.value = "";
     }
@@ -877,15 +1199,15 @@
     function openPremiumEditPrompt(currentCaption, onSaveCallback) {
       const popupHtml = `
         <div class="input-group" style="margin-top:6px; text-align:left;">
-          <label style="font-weight:800; color:#111827;">नया कैप्शन दर्ज करें</label>
-          <input type="text" id="customPromptInput" class="gate-input" style="background:#F9FAFB; color:#111; border:1px solid #D1D5DB;" value="${currentCaption || ''}">
+          <label style="font-weight:800; color:#111827;">${t("नया कैप्शन दर्ज करें")}</label>
+          <input type="text" id="customPromptInput" class="gate-input" style="background:#F9FAFB; color:#111; border:1px solid #D1D5DB;" value="${escapeHtml(currentCaption || '')}">
         </div>
         <div style="display:flex; gap:8px; margin-top:14px;">
-          <button class="btn-compact" style="background:#F3F4F6; color:#111; flex:1;" onclick="closeCustomPopup()">रद्द करें</button>
-          <button class="btn-compact btn-approve-comp" style="flex:1;" onclick="submitCustomPromptValue()">सेव करें</button>
+          <button class="btn-compact" style="background:#F3F4F6; color:#111; flex:1;" onclick="closeCustomPopup()">${t("रद्द करें")}</button>
+          <button class="btn-compact btn-approve-comp" style="flex:1;" onclick="submitCustomPromptValue()">${t("सेव करें")}</button>
         </div>
       `;
-      showCustomAlert("✏️ कैप्शन एडिट करें", "अपने मर्चेंट पोस्ट या रील का नया कैप्शन लिखें:", popupHtml);
+      showCustomAlert(t("✏️ कैप्शन एडिट करें"), t("अपने मर्चेंट पोस्ट या रील का नया कैप्शन लिखें:"), popupHtml);
       window._customPromptCallback = onSaveCallback;
       setTimeout(() => {
         const inp = document.getElementById('customPromptInput');
@@ -903,12 +1225,13 @@
 
     async function executeMediaAction(actionType) {
       closeReelActionSheet();
-      if(!selectedActiveMedia) return;
+      if(!selectedActiveMedia || !currentMerchantData) return;
 
       if(actionType === 'delete') {
-        if(confirm("क्या आप वाकई इसे डिलीट करना चाहते हैं?")) {
-          showCustomAlert("प्रोसेसिंग...", "डिलीट किया जा रहा है...");
-          await supabaseClient.from('reels').delete().eq('id', selectedActiveMedia.id);
+        const confirmMsg = currentLang === 'en' ? "Are you sure you want to delete this?" : "क्या आप वाकई इसे डिलीट करना चाहते हैं?";
+        if(confirm(confirmMsg)) {
+          showCustomAlert(t("प्रोसेसिंग..."), t("डिलीट किया जा रहा है..."));
+          await supabaseClient.from('reels').delete().eq('id', selectedActiveMedia.id).eq('merchant_id', currentMerchantData.id);
           await fetchMerchantMedia(currentMerchantData.id);
           closeCustomPopup();
         }
@@ -919,15 +1242,15 @@
 
         openPremiumEditPrompt(currentCap, async (newCaption) => {
           if(newCaption !== null) {
-            showCustomAlert("⏳ सेव हो रहा है...", "आपका नया कैप्शन अपडेट किया जा रहा है, कृपया प्रतीक्षा करें...");
-            const { error } = await supabaseClient.from('reels').update({ caption: newCaption }).eq('id', selectedActiveMedia.id);
+            showCustomAlert(t("⏳ सेव हो रहा है..."), t("आपका नया कैप्शन अपडेट किया जा रहा है, कृपया प्रतीक्षा करें..."));
+            const { error } = await supabaseClient.from('reels').update({ caption: newCaption }).eq('id', selectedActiveMedia.id).eq('merchant_id', currentMerchantData.id);
             if(!error) {
               await fetchMerchantMedia(currentMerchantData.id);
               closeCustomPopup();
-              setTimeout(() => showCustomAlert("सफलता ✅", "कैप्शन सफलतापूर्वक अपडेट हो गया है!"), 300);
+              setTimeout(() => showCustomAlert(t("सफलता ✅"), t("कैप्शन सफलतापूर्वक अपडेट हो गया है!")), 300);
             } else {
               closeCustomPopup();
-              setTimeout(() => showCustomAlert("त्रुटि", error.message), 300);
+              setTimeout(() => showCustomAlert(t("त्रुटि"), error.message), 300);
             }
           }
         });
@@ -936,13 +1259,13 @@
         const { data } = await supabaseClient.from('reels').select('*').eq('id', selectedActiveMedia.id).single();
         if(data) {
           let mediaUrl = data.video_url || data.url || data.image_url;
-          let pCap = data.caption || data.description || "कैप्शन नहीं दिया गया";
+          let pCap = data.caption || data.description || t("कैप्शन नहीं दिया गया");
           let container = document.getElementById('merchantFullViewMediaContainer');
           
           if(selectedActiveMedia.type === 'video') {
-            container.innerHTML = `<video src="${mediaUrl}" autoplay loop playsinline style="width: 100%; max-height: 60vh; object-fit: contain; display: block; background: #000;" controls></video>`;
+            container.innerHTML = `<video src="${encodeURI(mediaUrl)}" autoplay loop playsinline style="width: 100%; max-height: 60vh; object-fit: contain; display: block; background: #000;" controls></video>`;
           } else {
-            container.innerHTML = `<img src="${mediaUrl}" style="width: 100%; max-height: 60vh; object-fit: contain; display: block;">`;
+            container.innerHTML = `<img src="${encodeURI(mediaUrl)}" style="width: 100%; max-height: 60vh; object-fit: contain; display: block;">`;
           }
           
           document.getElementById('merchantFullViewCaption').innerText = pCap;
@@ -957,13 +1280,13 @@
     }
 
     async function updateMerchantOfferLive() {
-      if(!currentMerchantData) return showCustomAlert("त्रुटि", "कृपया पहले लॉगिन करें।");
+      if(!currentMerchantData) return showCustomAlert(t("त्रुटि"), t("कृपया पहले लॉगिन करें।"));
       const discount = document.getElementById('quickOfferInput').value.trim();
       const conditions = document.getElementById('offerConditionsInput').value.trim();
       
-      const { error } = await supabaseClient.from('merchants').update({ offer_details: { discount, conditions } }).eq('id', currentMerchantData.id);
-      if(!error) { showCustomAlert("सफलता", "आपका लाइव ऑफर कस्टमर ऐप पर अपडेट कर दिया गया है!"); }
-      else { showCustomAlert("त्रुटि", error.message); }
+      const { error } = await executeSilentSecureUpdate('offer', { offer_details: { discount, conditions } });
+      if(!error) { showCustomAlert(t("सफलता"), t("आपका लाइव ऑफर कस्टमर ऐप पर अपडेट कर दिया गया है!")); }
+      else { showCustomAlert(t("त्रुटि"), error.message); }
     }
 
     function toggleEditProfile() {
@@ -972,7 +1295,7 @@
       document.getElementById('editStoreAddress').disabled = !isEditing;
       document.getElementById('editStorePhone').disabled = !isEditing;
       document.getElementById('saveProfileBtn').style.display = isEditing ? 'inline-flex' : 'none';
-      document.getElementById('editProfileBtn').innerText = isEditing ? 'रद्द करें' : '✏️ एडिट प्रोफाइल';
+      document.getElementById('editProfileBtn').innerText = isEditing ? t('रद्द करें') : t('✏️ एडिट प्रोफाइल');
     }
 
     async function saveMerchantProfile() {
@@ -981,7 +1304,7 @@
       const newAddr = document.getElementById('editStoreAddress').value.trim();
       const newPhone = document.getElementById('editStorePhone').value.trim();
 
-      const { error } = await supabaseClient.from('merchants').update({ store_name: newName, address: newAddr, phone: newPhone }).eq('id', currentMerchantData.id);
+      const { error } = await executeSilentSecureUpdate('profile', { store_name: newName, address: newAddr, phone: newPhone });
       if(!error) {
         currentMerchantData.store_name = newName;
         currentMerchantData.address = newAddr;
@@ -989,8 +1312,8 @@
         document.getElementById('merchantStoreNameDisplay').innerText = newName;
         document.getElementById('merchantSubLocDisplay').innerText = newAddr || 'Delhi';
         toggleEditProfile();
-        showCustomAlert("सफलता", "प्रोफाइल सफलतापूर्वक सेव हो गई है!");
-      } else { showCustomAlert("त्रुटि", error.message); }
+        showCustomAlert(t("सफलता"), t("प्रोफाइल सफलतापूर्वक सेव हो गई है!"));
+      } else { showCustomAlert(t("त्रुटि"), error.message); }
     }
 
     async function uploadAutoFitMerchantBanner(event) {
@@ -1002,7 +1325,7 @@
       
       pbContainer.style.display = 'block'; 
       pbFill.style.width = '50%'; 
-      pbText.innerText = 'बैनर अपलोड हो रहा है...';
+      pbText.innerText = t('बैनर अपलोड हो रहा है...');
 
       const cleanId = String(currentMerchantData.id).replace(/[^a-zA-Z0-9]/g, '_');
       const fileName = `banner_${cleanId}_${Date.now()}`;
@@ -1015,19 +1338,19 @@
         if (error) { throw error; }
 
         pbFill.style.width = '100%'; 
-        pbText.innerText = 'सफलता! प्रोफाइल अपडेट हो रही है...';
+        pbText.innerText = t('सफलता! प्रोफाइल अपडेट हो रही है...');
         
         const { data: publicUrlData } = supabaseClient.storage.from('merchants').getPublicUrl(fileName);
         const bannerUrl = publicUrlData.publicUrl;
         
-        await supabaseClient.from('merchants').update({ image_url: bannerUrl }).eq('id', currentMerchantData.id);
+        await executeSilentSecureUpdate('banner', { image_url: bannerUrl });
         currentMerchantData.image_url = bannerUrl;
         document.getElementById('merchantBannerDisplay').src = bannerUrl;
         
         setTimeout(() => { pbContainer.style.display = 'none'; pbFill.style.width = '0%'; }, 1000);
       } catch (err) {
         pbContainer.style.display = 'none';
-        showCustomAlert("त्रुटि", "बैनर अपलोड नहीं हो सका: " + err.message);
+        showCustomAlert(t("त्रुटि"), t("बैनर अपलोड नहीं हो सका:") + " " + err.message);
       }
       event.target.value = "";
     }
@@ -1037,14 +1360,14 @@
       const toggleEl = document.getElementById('storeStatusToggle');
       const label = document.getElementById('storeStatusLabel');
       toggleEl.checked = isStoreOpen;
-      label.innerText = isStoreOpen ? '🟢 स्टोर स्थिति चालू (Live)' : '🔴 स्टोर स्थिति बंद';
+      label.innerText = isStoreOpen ? t('🟢 स्टोर स्थिति चालू (Live)') : t('🔴 स्टोर स्थिति बंद');
     }
 
     async function toggleStoreStatus(checkbox) {
-      if (!currentMerchantData) { checkbox.checked = !checkbox.checked; return showCustomAlert("लॉगिन आवश्यक", "कृपया लॉगिन करें।"); }
+      if (!currentMerchantData) { checkbox.checked = !checkbox.checked; return showCustomAlert(t("लॉगिन आवश्यक"), t("कृपया लॉगिन करें।")); }
       const newStatus = checkbox.checked ? 'approved' : 'closed';
       updateStoreStatusUI(newStatus);
-      await supabaseClient.from('merchants').update({ status: newStatus }).eq('id', currentMerchantData.id);
+      await executeSilentSecureUpdate('status', { status: newStatus });
       currentMerchantData.status = newStatus;
     }
 
@@ -1061,9 +1384,19 @@
     function calcBackSpace() { calcClearSingleEntry(); }
     function calcEvaluate() {
       try {
-        const sanitized = calcExpression.replace(/[^0-9+\-*/.]/g, '');
-        let result = new Function('return ' + sanitized)();
-        calcExpression = String(result);
+        const tokens = calcExpression.match(/(\d+\.?\d*|\+|\-|\*|\/)/g);
+        if (!tokens) { calcExpression = "0"; updateCalcDisplay(); return; }
+        let total = parseFloat(tokens[0]) || 0;
+        for (let i = 1; i < tokens.length; i += 2) {
+          const op = tokens[i];
+          const nextVal = parseFloat(tokens[i+1]);
+          if (isNaN(nextVal)) throw new Error("Invalid");
+          if (op === '+') total += nextVal;
+          else if (op === '-') total -= nextVal;
+          else if (op === '*') total *= nextVal;
+          else if (op === '/') { if (nextVal === 0) throw new Error("DivZero"); total /= nextVal; }
+        }
+        calcExpression = String(Math.round(total * 100) / 100);
       } catch (e) { calcExpression = "Error"; }
       updateCalcDisplay();
       if(calcExpression === "Error") setTimeout(calcClear, 1500);
@@ -1073,15 +1406,15 @@
       document.querySelectorAll('.tab-screen').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
       document.getElementById(`tab-${tabName}`).classList.add('active');
-      clickedEl.classList.add('active');
+      if (clickedEl) clickedEl.classList.add('active');
       
       if(tabName === 'network') fetchB2BNetworkMerchants();
     }
 
     function showCustomAlert(title, message, customHtml = '') {
-      document.getElementById('popupTitle').innerText = title;
-      document.getElementById('popupMessage').innerText = message;
-      document.getElementById('popupCustomBody').innerHTML = customHtml + `<button class="btn-compact btn-approve-comp" style="width:100%; margin-top:12px;" onclick="closeCustomPopup()">ठीक है (Close)</button>`;
+      document.getElementById('popupTitle').innerText = t(title);
+      document.getElementById('popupMessage').innerText = t(message);
+      document.getElementById('popupCustomBody').innerHTML = customHtml + `<button class="btn-compact btn-approve-comp" style="width:100%; margin-top:12px;" onclick="closeCustomPopup()">${t("ठीक है (Close)")}</button>`;
       document.getElementById('customPopupOverlay').classList.add('open');
     }
     
@@ -1090,15 +1423,15 @@
 
     function renderMerchantNotes() {
       const container = document.getElementById('merchantNotesListContainer');
-      if (!merchantNotesArray.length) { container.innerHTML = `<div style="font-size:11px; color:#6B7280; text-align:center; padding:6px;">कोई नोट नहीं।</div>`; return; }
+      if (!merchantNotesArray.length) { container.innerHTML = `<div style="font-size:11px; color:#6B7280; text-align:center; padding:6px;">${t("कोई नोट नहीं।")}</div>`; return; }
       container.innerHTML = merchantNotesArray.map((n, i) => `
         <div class="note-item-row">
-          <div><b>📌 ${n.text}</b></div>
+          <div><b>📌 ${escapeHtml(n.text)}</b></div>
           <button class="note-delete-btn" onclick="deleteMerchantNote(${i})">✕</button>
         </div>`).join('');
     }
     function openAddNotePrompt() {
-      showCustomAlert("नया नोट", "हिसाब दर्ज करें:", `<input type="text" id="newNoteInput" class="input-group" placeholder="जैसे: 200 उधार"><button class="btn-compact btn-approve-comp" onclick="saveNote()">सेव करें</button>`);
+      showCustomAlert(t("नया नोट"), t("हिसाब दर्ज करें:"), `<input type="text" id="newNoteInput" class="input-group" placeholder="${t("जैसे: 200 उधार")}"><button class="btn-compact btn-approve-comp" onclick="saveNote()">${t("सेव करें")}</button>`);
     }
     function saveNote() {
       const val = document.getElementById('newNoteInput').value.trim();
@@ -1106,56 +1439,64 @@
     }
     function deleteMerchantNote(i) { merchantNotesArray.splice(i, 1); localStorage.setItem('merchant_notes', JSON.stringify(merchantNotesArray)); renderMerchantNotes(); }
 
-    async function openQueryModal() {
-      if (!currentMerchantData) return showCustomAlert("लॉगिन आवश्यक", "सपोर्ट टीम से बात करने के लिए कृपया पहले लॉगिन करें।");
+    function renderQueryCardsHTML(data) {
+      return data.map(q => {
+        const replyMsg = q.staff_reply || q.reply_text || '';
+        const isPending = q.status === 'Pending' && !replyMsg;
+        return `
+          <div style="background:#FFF; border:1px solid #D1D5DB; border-radius:10px; padding:12px; margin-bottom:10px; font-size:12px; text-align:left;">
+            <div style="color:#1F2937; font-weight:800;">${t("💬 सवाल:")} ${escapeHtml(q.query_text)}</div>
+            <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center;">
+              <span style="color:${isPending ? '#B45309' : '#059669'}; font-weight:800; background:${isPending ? '#FEF3C7' : '#D1FAE5'}; padding:3px 8px; border-radius:6px; font-size:10px;">
+                ${isPending ? t('⏳ पेंडिंग') : t('✅ जवाब मिला')}
+              </span>
+            </div>
+            ${replyMsg ? `<div style="color:#065F46; margin-top:8px; background:#ECFDF5; padding:8px; border-radius:6px; border:1px solid #A7F3D0; font-weight:700;"><b>${t("सपोर्ट रिप्लाई:")}</b> ${escapeHtml(replyMsg)}</div>` : ''}
+          </div>
+        `;
+      }).join('');
+    }
 
-      let historyHtml = `<div style="font-size:11px; color:#6B7280; text-align:center; padding:10px;">पुरानी क्वेरीज़ लोड हो रही हैं...</div>`;
+    async function openQueryModal() {
+      if (!currentMerchantData) return showCustomAlert(t("लॉगिन आवश्यक"), t("सपोर्ट टीम से बात करने के लिए कृपया पहले लॉगिन करें।"));
+
+      let historyHtml = `<div style="font-size:11px; color:#6B7280; text-align:center; padding:10px;">${t("पुरानी क्वेरीज़ लोड हो रही हैं...")}</div>`;
 
       const htmlContent = `
         <div class="input-group" style="margin-top:10px; text-align:left;">
-          <label>अपनी समस्या या सवाल दर्ज करें</label>
-          <textarea id="merchantQueryInput" rows="3" placeholder="यहाँ टाइप करें..."></textarea>
+          <label>${t("अपनी समस्या या सवाल दर्ज करें")}</label>
+          <textarea id="merchantQueryInput" rows="3" placeholder="${t("यहाँ टाइप करें...")}"></textarea>
         </div>
-        <button class="btn-compact btn-approve-comp" style="width:100%; margin-top:10px;" onclick="submitMerchantQuery()">सपोर्ट को भेजें</button>
+        <button class="btn-compact btn-approve-comp" style="width:100%; margin-top:10px;" onclick="submitMerchantQuery()">${t("सपोर्ट को भेजें")}</button>
         
         <div style="margin-top:20px; text-align:left; border-top:1px solid #E5E7EB; padding-top:14px;">
-          <div style="font-size:13px; font-weight:800; color:#111827; margin-bottom:8px;">📥 आपकी सपोर्ट हिस्ट्री:</div>
+          <div style="font-size:13px; font-weight:800; color:#111827; margin-bottom:8px;">${t("📥 आपकी सपोर्ट हिस्ट्री:")}</div>
           <div id="queryHistoryContainer" style="max-height:180px; overflow-y:auto; background:#F9FAFB; border-radius:8px; padding:8px; border:1px solid #E5E7EB;">
             ${historyHtml}
           </div>
         </div>
       `;
-      showCustomAlert("मर्चेंट सपोर्ट", "सपोर्ट स्टाफ से सहायता लें:", htmlContent);
+      showCustomAlert(t("मर्चेंट सपोर्ट"), t("सपोर्ट स्टाफ से सहायता लें:"), htmlContent);
 
       const { data, error } = await supabaseClient
         .from('merchant_queries')
         .select('*')
         .eq('merchant_name', currentMerchantData.store_name)
-        .order('created_at', { ascending: false });
+        .order('id', { ascending: false });
 
       const container = document.getElementById('queryHistoryContainer');
       if (container) {
         if (error || !data || data.length === 0) {
-          container.innerHTML = `<div style="font-size:11px; color:#6B7280; text-align:center; padding:10px;">अभी तक कोई क्वेरी नहीं भेजी गई है।</div>`;
+          container.innerHTML = `<div style="font-size:11px; color:#6B7280; text-align:center; padding:10px;">${t("अभी तक कोई क्वेरी नहीं भेजी गई है।")}</div>`;
         } else {
-          container.innerHTML = data.map(q => `
-            <div style="background:#FFF; border:1px solid #D1D5DB; border-radius:8px; padding:10px; margin-bottom:8px; font-size:12px;">
-              <div style="color:#1F2937; font-weight:700;">सवाल: ${q.query_text}</div>
-              <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center;">
-                <span style="color:${q.status === 'Pending' ? '#B45309' : '#059669'}; font-weight:800; background:${q.status === 'Pending' ? '#FEF3C7' : '#D1FAE5'}; padding:3px 8px; border-radius:6px; font-size:10px;">
-                  ${q.status === 'Pending' ? '⏳ पेंडिंग' : '✅ जवाब मिला'}
-                </span>
-              </div>
-              ${q.reply_text ? `<div style="color:#065F46; margin-top:8px; background:#ECFDF5; padding:8px; border-radius:6px; font-weight:600;"><b>एडमिन रिप्लाई:</b> ${q.reply_text}</div>` : ''}
-            </div>
-          `).join('');
+          container.innerHTML = renderQueryCardsHTML(data);
         }
       }
     }
 
     async function submitMerchantQuery() {
       const queryText = document.getElementById('merchantQueryInput').value.trim();
-      if (!queryText || !currentMerchantData) return showCustomAlert("त्रुटि", "कृपया पहले लॉगिन करें और क्वेरी लिखें।");
+      if (!queryText || !currentMerchantData) return showCustomAlert(t("त्रुटि"), t("कृपया पहले लॉगिन करें और क्वेरी लिखें।"));
       
       const { error } = await supabaseClient.from('merchant_queries').insert([{
         merchant_name: currentMerchantData.store_name,
@@ -1165,9 +1506,9 @@
       
       if (!error) {
         closeCustomPopup();
-        showCustomAlert("सफलता", "आपकी क्वेरी सपोर्ट टीम को भेज दी गई है!");
+        showCustomAlert(t("सफलता"), t("आपकी क्वेरी सपोर्ट टीम को भेज दी गई है!"));
       } else {
-        showCustomAlert("त्रुटि", error.message);
+        showCustomAlert(t("त्रुटि"), error.message);
       }
     }
 
@@ -1190,27 +1531,34 @@
     async function fetchNotifications() {
       const container = document.getElementById('dynamicNotificationContent');
       if (!container || !supabaseClient) return;
-      const { data, error } = await supabaseClient.from('alerts').select('*');
-      if (error || !data || data.length === 0) {
-        container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:10px;">कोई नया नोटिफिकेशन नहीं है।</div>`;
+
+      if (!currentMerchantData) {
+        container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:16px;">${t("अपनी क्वेरीज़ और सपोर्ट रिप्लाई देखने के लिए कृपया पहले लॉगिन करें।")}</div>`;
         return;
       }
-      container.innerHTML = data.map(n => `
-        <div style="background:#FFF; padding:10px; border-radius:8px; margin-bottom:8px; border:1px solid #E5E7EB; font-size:12px;">
-          <b>${n.title || 'सूचना'}</b>
-          <p style="color:#4B5563; margin-top:2px;">${n.message || ''}</p>
-        </div>
-      `).join('');
+
+      container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:16px;">${t("लोड किया जा रहा है...")}</div>`;
+
+      const { data, error } = await supabaseClient
+        .from('merchant_queries')
+        .select('*')
+        .eq('merchant_name', currentMerchantData.store_name)
+        .order('id', { ascending: false });
+
+      if (error || !data || data.length === 0) {
+        container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:16px;">${t("आपकी कोई सपोर्ट क्वेरी या नया अलर्ट नहीं है।")}</div>`;
+        return;
+      }
+      container.innerHTML = renderQueryCardsHTML(data);
     }
-      if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/kaito-app-builder/sw.js')
-        .then(reg => console.log('Service Worker registered successfully!'))
-        .catch(err => console.log('Service Worker registration failed:', err));
-    });
-  }
-</script>
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/kaito-app-builder/sw.js')
+          .then(reg => console.log('Service Worker registered successfully!'))
+          .catch(err => console.log('Service Worker registration failed:', err));
+      });
+    }
+  </script>
 </body>
 </html>
-
-
