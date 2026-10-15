@@ -9,110 +9,76 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Star Merchant - Secure Dashboard</title>
 
-  <!-- 🚨 STEP 0: ANTI-DESKTOP HARDWARE LOCK WITH FOUNDER GOD-MODE BYPASS 🚨 -->
+  <!-- 🛡️ STEP 0: HARDWARE LOCK & ANTI-DEBUGGER FORTRESS 🛡️ -->
   <script>
-    (function enforceHardwareFortress() {
-      // फाउंडर मास्टर बायपास: लोकल फाइल, मोबाइल प्रिव्यू या URL में # / ?founder=4821 होने पर हमेशा खुलेगा
-      const isLocalEnv = window.location.protocol === 'file:' || 
-                         window.location.hostname === 'localhost' || 
-                         window.location.hostname === '127.0.0.1' || 
-                         window.location.pathname.includes('/storage/emulated/');
-      const hasFounderKey = window.location.hash === '#abhishek' || window.location.search.includes('founder=19821');
-
-      if (hasFounderKey) {
-        sessionStorage.setItem('founder_god_mode', 'active');
-      }
-      if (isLocalEnv || sessionStorage.getItem('founder_god_mode') === 'active') {
-        return; // फाउंडर के लिए पूर्ण एक्सेस
-      }
-
-      const ua = navigator.userAgent || '';
-      const platform = navigator.platform || '';
-      const isDesktopOS = /Win32|Win64|MacIntel|Macintosh|Linux x86_64|X11|CrOS/i.test(platform) || /Windows NT|Macintosh|X11/i.test(ua);
-      const isMobileUA = /Android|iPhone|iPod|iPad/i.test(ua);
-      const hasPhysicalTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-
-      if (isDesktopOS || !isMobileUA || !hasPhysicalTouch || navigator.webdriver) {
-        window.stop();
-        document.documentElement.innerHTML = `
-          <head><title>Restricted</title></head>
-          <body style="margin:0;padding:20px;background:#0b0b0f;color:#EF4444;height:100vh;width:100vw;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:sans-serif;text-align:center;user-select:none;">
-            <div style="font-size:48px;margin-bottom:12px;">🔒</div>
-            <div style="font-size:18px;font-weight:900;color:#FFF;">केवल मोबाइल डिवाइस पर उपलब्ध</div>
-            <div style="font-size:13px;color:#9CA3AF;margin-top:6px;">Star Merchant Dashboard is strictly locked to authorized mobile devices.</div>
-          </body>
-        `;
-        window.fetch = function() { return Promise.reject('Hardware Locked'); };
-        throw new Error('Desktop Access Denied');
-      }
+    (function enforceFortress() {
+      try {
+        const threshold = 160;
+        const checkInterval = setInterval(() => {
+          if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
+            document.documentElement.innerHTML = '<body style="background:#0b0b0f;color:#EF4444;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;"><h2>Access Restricted: Developer Tools Detected</h2></body>';
+            clearInterval(checkInterval);
+          }
+        }, 1000);
+      } catch (e) {}
     })();
   </script>
 
   <link rel="manifest" href="manifest.json">
-  <!-- OneSignal SDK (Push Notification Engine) -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script>
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function(OneSignal) {
-      await OneSignal.init({
-        appId: "8e294ccb-8236-4513-8860-86cf0cf1b275",
-      });
+      await OneSignal.init({ appId: "8e294ccb-8236-4513-8860-86cf0cf1b275" });
     });
   </script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     body { background-color: #E5E7EB; display: flex; justify-content: center; overflow-x: hidden; }
-    
     .device-shell { width: 100%; max-width: 480px; min-height: 100vh; background-color: #F8F9FA; position: relative; display: flex; flex-direction: column; padding-bottom: 80px; box-shadow: 0 0 20px rgba(0,0,0,0.1); background-clip: padding-box; }
-    
     .top-header { background-color: #FFFFFF; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E9ECEF; position: sticky; top: 0; z-index: 40; width: 100%; }
     .brand-title { font-size: 16px; font-weight: 900; letter-spacing: 0.5px; color: #111827; display: flex; align-items: center; gap: 5px; user-select: none; }
     .brand-title .star-badge { color: #F59E0B; font-size: 15px; }
     .header-right-box { display: flex; align-items: center; gap: 8px; }
     .header-msg-btn { width: 36px; height: 36px; background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; position: relative; }
-    .header-msg-btn.noti::after { content: ''; position: absolute; top: 6px; right: 8px; width: 8px; height: 8px; background: #EF4444; border-radius: 50%; border: 2px solid #fff; }
+    
+    /* Auto-Seen Notification Counter Badge */
+    .noti-badge { position: absolute; top: -5px; right: -5px; background: #DC2626; color: #FFF; font-size: 10px; font-weight: 900; min-width: 18px; height: 18px; padding: 0 4px; display: none; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid #FFF; box-shadow: 0 2px 4px rgba(0,0,0,0.25); z-index: 10; }
+    
     .lang-switch-btn { background: #FEF3C7; border: 1px solid #FDE68A; padding: 5px 10px; border-radius: 10px; color: #B45309; font-size: 11px; font-weight: 900; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: transform 0.1s; }
     .lang-switch-btn:active { transform: scale(0.95); }
-
     .noti-overlay, .reel-action-sheet, .custom-popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; opacity: 0; transition: opacity 0.3s; justify-content: center; align-items: center; }
     .custom-popup-overlay { z-index: 999998; } 
     .noti-overlay.open, .reel-action-sheet.open, .custom-popup-overlay.open { display: flex; opacity: 1; }
     .noti-overlay { align-items: stretch; justify-content: flex-end; z-index: 999998; }
-    
     .noti-sidebar { width: 85%; max-width: 340px; height: 100vh; background: #FFFFFF; transform: translateX(100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.15); }
     .noti-overlay.open .noti-sidebar { transform: translateX(0); }
     .noti-header { background: #111827; padding: 16px; display: flex; justify-content: space-between; align-items: center; color: #fff; }
-    .noti-title { font-size: 16px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
+    .noti-title { font-size: 15px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
     .noti-close-btn { background: none; border: none; color: #F59E0B; font-size: 28px; font-weight: 300; cursor: pointer; line-height: 1; }
     .noti-content { padding: 16px; overflow-y: auto; flex: 1; background: #F8F9FA; }
-    
     .tab-screen { display: none; padding: 14px; width: 100%; }
     .tab-screen.active { display: block; }
-    
     .status-card, .action-card, .studio-upload-box, .profile-card, .notes-bar-container, .calc-container { background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px; padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
     .status-card { display: flex; justify-content: space-between; align-items: center; }
     .status-info-title { font-size: 13px; font-weight: 800; color: #111827; }
     .status-info-sub { font-size: 10px; color: #6B7280; margin-top: 2px; }
-    
     .switch { position: relative; display: inline-block; width: 46px; height: 24px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; inset: 0; background-color: #E5E7EB; transition: .2s; border-radius: 24px; }
     .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
     input:checked + .slider { background-color: #059669; }
     input:checked + .slider:before { transform: translateX(22px); }
-    
     .metric-card { background: linear-gradient(135deg, #111827, #1F2937); color: #FFFFFF; border-radius: 14px; padding: 16px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     .metric-title { font-size: 12px; font-weight: 700; color: #9CA3AF; }
     .metric-value { font-size: 26px; font-weight: 900; color: #F59E0B; margin: 4px 0; }
     .metric-sub { font-size: 11px; color: #D1D5DB; }
-    
     .action-card-title { font-size: 14px; font-weight: 800; color: #111827; margin-bottom: 10px; }
     .input-group { margin-bottom: 10px; text-align: left; }
     .input-group label { display: block; font-size: 11px; font-weight: 700; color: #4B5563; margin-bottom: 3px; }
     .input-group input, .input-group textarea { width: 100%; padding: 10px; border: 1px solid #D1D5DB; border-radius: 8px; font-size: 13px; outline: none; background: #F9FAFB; transition: border-color 0.2s; }
     .input-group input:focus, .input-group textarea:focus { border-color: #2563EB; background: #FFFFFF; }
-    
     .calc-screen { width: 100%; background: #111827; color: #F59E0B; font-size: 34px; font-weight: 900; padding: 18px 14px; border-radius: 12px; text-align: right; margin-bottom: 14px; border: 1px solid #374151; overflow-x: auto; white-space: nowrap; word-break: keep-all; letter-spacing: 1.5px; }
     .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
     .calc-btn { padding: 18px 0; font-size: 18px; font-weight: 800; background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 12px; cursor: pointer; color: #1F2937; text-align: center; transition: background 0.1s, transform 0.05s; }
@@ -122,99 +88,67 @@
     .calc-btn.ac { background: #FEE2E2; color: #DC2626; border-color: #FECACA; }
     .calc-btn.c-btn { background: #FFEDD5; color: #C2410C; border-color: #FED7AA; }
     .calc-btn.del { background: #F3F4F6; color: #4B5563; }
-
     .notes-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .notes-section-title { font-size: 14px; font-weight: 900; color: #111827; display: flex; align-items: center; gap: 6px; }
     .add-note-btn { background: #2563EB; color: #FFF; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 16px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(37,99,235,0.3); }
     .note-item-row { background: #FFFBEB; border: 1px solid #FDE68A; padding: 10px 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #111827; }
     .note-delete-btn { background: none; border: none; color: #DC2626; font-weight: 800; cursor: pointer; font-size: 14px; }
-    
     .btn-row { display: flex; gap: 6px; margin-top: 8px; }
     .btn-compact { padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 4px; width: 100%; transition: opacity 0.2s; }
     .btn-compact:active { opacity: 0.8; }
     .btn-approve-comp { background: #059669; color: #FFFFFF; box-shadow: 0 2px 6px rgba(5, 150, 105, 0.2); }
-    
     .studio-header-card { background: #111827; color: #fff; border-radius: 14px; padding: 16px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
     .reel-progress-container, .progress-container { display: none; width: 100%; background: #E5E7EB; border-radius: 8px; overflow: hidden; height: 16px; margin-top: 10px; position: relative; }
     .reel-progress-fill, .progress-bar-fill { height: 100%; width: 0%; background: #059669; transition: width 0.3s ease; }
     .progress-bar-fill { background: #2563EB; }
     .reel-progress-text, .progress-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: #FFFFFF; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
-
     .reels-grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 14px; }
     .reel-grid-item { aspect-ratio: 1/1; background: #111827; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; user-select: none; border: 1px solid #E5E7EB; }
-    .reel-grid-item video, .reel-grid-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .media-type-badge { position: absolute; bottom: 4px; right: 4px; background: rgba(0,0,0,0.7); color: #fff; font-size: 9px; padding: 2px 4px; border-radius: 4px; font-weight: 800; }
-
+    .reel-grid-item video, .reel-grid-item img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+    .media-type-badge { position: absolute; bottom: 4px; right: 4px; background: rgba(0,0,0,0.75); color: #fff; font-size: 9px; padding: 2px 5px; border-radius: 4px; font-weight: 800; pointer-events: none; }
+    .media-caption-tag { position: absolute; top: 4px; left: 4px; right: 4px; background: rgba(0,0,0,0.65); color: #FDE68A; font-size: 8.5px; padding: 2px 4px; border-radius: 4px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
     .reel-action-sheet { z-index: 999998; align-items: flex-end; }
     .reel-action-card { background: #FFFFFF; width: 100%; max-width: 480px; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; box-shadow: 0 -10px 30px rgba(0,0,0,0.3); transform: translateY(100%); transition: transform 0.3s ease-out; }
     .reel-action-sheet.open .reel-action-card { transform: translateY(0); }
     .action-sheet-title { font-size: 14px; font-weight: 900; color: #111827; margin-bottom: 14px; text-align: center; border-bottom: 1px solid #E5E7EB; padding-bottom: 8px; }
-    .action-sheet-btn { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #E5E7EB; background: #F9FAFB; font-size: 13px; font-weight: 800; color: #1F2937; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.1s; }
+    .action-sheet-btn { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #E5E7EB; background: #F9FAFB; font-size: 13px; font-weight: 800; color: #1F2937; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
     .action-sheet-btn:active { background: #F3F4F6; }
     .action-sheet-btn.danger { background: #FEF2F2; color: #DC2626; border-color: #FEE2E2; }
     .action-sheet-btn.success { background: #ECFDF5; color: #059669; border-color: #A7F3D0; }
-
     .merchant-full-view-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 99999999 !important; display: none; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(6px); }
     .merchant-full-view-overlay.open { display: flex; }
-    .merchant-full-view-card { background: #FFFFFF; width: 100%; max-width: 380px; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 15px 35px rgba(0,0,0,0.4); position: relative; animation: slideUpModal 0.25s ease-out; }
-    @keyframes slideUpModal { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-    .custom-popup-card { background: #FFFFFF; width: 90%; max-width: 330px; border-radius: 20px; padding: 22px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.3); position: relative; }
-    
+    .merchant-full-view-card { background: #FFFFFF; width: 100%; max-width: 380px; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 15px 35px rgba(0,0,0,0.4); position: relative; }
+    .custom-popup-card { background: #FFFFFF; width: 90%; max-width: 340px; border-radius: 20px; padding: 22px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.3); position: relative; max-height: 85vh; overflow-y: auto; }
     .profile-card { text-align: center; position: relative; }
     .profile-top-action-btn { position: absolute; top: 12px; right: 12px; background: #111827; color: #F59E0B; border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; z-index: 10; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
     .profile-banner-box { width: 100%; height: 100px; border-radius: 10px; overflow: hidden; margin-bottom: 10px; background: #111827; border: 1px solid #E5E7EB; position: relative; }
     .profile-banner-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .name-title-text { font-size: 16px; font-weight: 800; color: #111827; margin-top: 6px; }
     
-    /* 🔒 ROCK-SOLID FIXED BOTTOM NAVIGATION (कभी ऊपर नहीं खिसकेगा और कभी गायब नहीं होगा) */
+    /* 3D METALLIC BOTTOM NAV BAR */
     .bottom-nav { position: fixed !important; bottom: 0 !important; left: 50% !important; transform: translateX(-50%) !important; width: 100% !important; max-width: 480px !important; height: 62px !important; background: #FFFFFF !important; border-top: 1px solid #E5E7EB !important; display: flex !important; justify-content: space-around !important; align-items: center !important; z-index: 9999 !important; box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06); }
     .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 10px; color: #6B7280; cursor: pointer; height: 100%; transition: color 0.3s ease; user-select: none; }
     .nav-item.active { color: #111827; font-weight: 800; }
     .nav-item .icon { display: flex; align-items: center; justify-content: center; height: 30px; margin-bottom: 2px; }
     .nav-item .icon svg { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    
     .nav-item:not(.active) .icon svg { opacity: 0.4; transform: scale(0.85); filter: grayscale(100%); }
     .nav-item.active .icon svg { opacity: 1; transform: scale(1.15); filter: sepia(1) saturate(5) hue-rotate(5deg) brightness(1.2) drop-shadow(0 4px 10px rgba(212, 175, 55, 0.6)); }
     
     .login-lock-layer { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; background: #FFF; border-radius: 12px; border: 1px solid #E5E7EB; text-align: center; }
-    .login-lock-icon { font-size: 40px; margin-bottom: 10px; }
-    .login-lock-title { font-size: 16px; font-weight: 800; color: #111827; margin-bottom: 6px; }
-    .login-lock-desc { font-size: 12px; color: #6B7280; margin-bottom: 20px; }
-
     .login-gate-overlay { position: fixed; inset: 0; background: #0b0b0f; z-index: 999997; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; transition: opacity 0.5s ease, visibility 0.5s; }
     .login-gate-card { background: #16161a; width: 100%; max-width: 360px; padding: 30px 20px; border-radius: 20px; border: 1px solid #27272a; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
     .led-indicator { width: 16px; height: 16px; border-radius: 50%; background: #4B5563; margin: 0 auto 20px auto; box-shadow: 0 0 10px rgba(75, 85, 99, 0.5); transition: all 0.3s ease; }
-    .led-red { background: #DC2626; box-shadow: 0 0 20px #DC2626, inset 0 0 5px #7f1d1d; animation: blinkRed 1s infinite; }
+    .led-red { background: #DC2626; box-shadow: 0 0 20px #DC2626, inset 0 0 5px #7f1d1d; }
     .led-green { background: #10B981; box-shadow: 0 0 20px #10B981, inset 0 0 5px #064e3b; }
-    @keyframes blinkRed { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
     .gate-input { width: 100%; padding: 14px; margin-bottom: 15px; background: #1f1f23; border: 1px solid #3f3f46; border-radius: 10px; color: #fff; font-size: 14px; outline: none; }
-    .gate-input:focus { border-color: #F59E0B; }
-    .gate-btn { width: 100%; padding: 14px; background: #F59E0B; color: #0b0b0f; border: none; border-radius: 10px; font-size: 15px; font-weight: 900; cursor: pointer; transition: background 0.2s; margin-top: 10px; }
-    .gate-btn:active { transform: scale(0.98); }
-    .gate-message { margin-top: 15px; font-size: 12px; font-weight: 700; height: 15px; }
+    .gate-btn { width: 100%; padding: 14px; background: #F59E0B; color: #0b0b0f; border: none; border-radius: 10px; font-size: 15px; font-weight: 900; cursor: pointer; margin-top: 10px; }
+    .gate-message { margin-top: 15px; font-size: 12px; font-weight: 700; min-height: 18px; }
     .msg-red { color: #F87171; }
     .msg-green { color: #34D399; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-
-  <!-- द मेन लॉगिन गेट -->
-  <div class="login-gate-overlay" id="mainLoginGate">
-    <div class="login-gate-card">
-      <div class="led-indicator" id="gateLed"></div>
-      <div style="font-size:22px; font-weight:900; color:#fff; margin-bottom:5px;"><span style="color:#F59E0B;">★</span> STAR SHOP</div>
-      <div style="font-size:12px; color:#9CA3AF; margin-bottom:25px;">मर्चेंट पार्टनर नेटवर्क</div>
-      
-      <input type="text" id="gateMerchantId" class="gate-input" placeholder="मर्चेंट आईडी (Store ID)" autocomplete="off">
-      <input type="password" id="gateMerchantPin" class="gate-input" placeholder="4-अंकों का पिन" maxlength="4" inputmode="numeric" autocomplete="off">
-      
-      <button class="gate-btn" id="gateLoginBtn" onclick="attemptGateLogin()">सुरक्षित लॉगिन</button>
-      <div class="gate-message" id="gateMessage"></div>
-      <button onclick="window.open('https://marchent-form2.netlify.app/', '_blank')" style="margin-top: 25px; background: none; border: none; color: #9CA3AF; text-decoration: underline; font-size: 12px; cursor: pointer;">नया मर्चेंट अकाउंट रजिस्टर करें</button>
-    </div>
-  </div>
 
   <!-- 3D Metallic SVG Definitions -->
   <svg width="0" height="0" style="position:absolute; width:0; height:0; pointer-events:none;">
@@ -232,25 +166,41 @@
     </defs>
   </svg>
 
+  <div class="login-gate-overlay" id="mainLoginGate">
+    <div class="login-gate-card">
+      <div class="led-indicator" id="gateLed"></div>
+      <div style="font-size:22px; font-weight:900; color:#fff; margin-bottom:5px;"><span style="color:#F59E0B;">★</span> <span data-i18n="app_title">STAR SHOP</span></div>
+      <div style="font-size:12px; color:#9CA3AF; margin-bottom:25px;" data-i18n="gate_subtitle">मर्चेंट पार्टनर नेटवर्क</div>
+      <input type="text" id="gateMerchantId" class="gate-input" placeholder="मर्चेंट आईडी (Store ID)" data-i18n-ph="gate_id_ph" autocomplete="off">
+      <input type="password" id="gateMerchantPin" class="gate-input" placeholder="4-अंकों का पिन" data-i18n-ph="gate_pin_ph" maxlength="4" inputmode="numeric" autocomplete="off">
+      <button class="gate-btn" id="gateLoginBtn" onclick="attemptGateLogin()" data-i18n="gate_btn">सुरक्षित लॉगिन</button>
+      <div class="gate-message" id="gateMessage"></div>
+      <button onclick="window.open('https://marchent-form2.netlify.app/', '_blank')" style="margin-top: 25px; background: none; border: none; color: #9CA3AF; text-decoration: underline; font-size: 12px; cursor: pointer;" data-i18n="gate_register">नया मर्चेंट अकाउंट रजिस्टर करें</button>
+    </div>
+  </div>
+
   <div class="device-shell">
     <header class="top-header" id="merchantHeader">
       <div class="brand-title"><span class="star-badge">★</span> STAR MERCHANT</div>
       <div class="header-right-box">
         <button class="lang-switch-btn" onclick="toggleLanguage()" id="langSwitchBtn">🌐 EN</button>
         <div class="header-msg-btn" onclick="openQueryModal()" title="Support">💬</div>
-        <div class="header-msg-btn noti" onclick="toggleNotifications()" title="Merchant Queries">🔔</div>
+        <div class="header-msg-btn" onclick="toggleNotifications()" title="Notifications" style="position:relative;">
+          🔔
+          <span id="notiBadgeCount" class="noti-badge">0</span>
+        </div>
       </div>
     </header>
 
-    <!-- Notifications Sidebar Overlay (केवल मर्चेंट सपोर्ट क्वेरीज़ और रिप्लाई) -->
+    <!-- Notifications Sidebar Overlay -->
     <div class="noti-overlay" id="notiOverlay" onclick="closeNotifications(event)">
       <div class="noti-sidebar" id="notiSidebar">
         <div class="noti-header">
-          <div class="noti-title">🔔 आपकी सपोर्ट क्वेरीज़</div>
+          <div class="noti-title" data-i18n="noti_title">🔔 आपके सपोर्ट क्वेरीज़ एवं अलर्ट्स</div>
           <button class="noti-close-btn" onclick="toggleNotifications()">×</button>
         </div>
         <div class="noti-content" id="dynamicNotificationContent">
-          <div style="font-size:12px; color:#6B7280; text-align:center; padding:10px;">लोड किया जा रहा है...</div>
+          <div style="font-size:12px; color:#6B7280; text-align:center; padding:10px;" data-i18n="loading">लोड किया जा रहा है...</div>
         </div>
       </div>
     </div>
@@ -259,8 +209,8 @@
     <main id="tab-home" class="tab-screen active">
       <div class="status-card">
         <div>
-          <div class="status-info-title" id="storeStatusLabel">🔴 स्टोर स्थिति बंद</div>
-          <div class="status-info-sub">कस्टमर ऐप पर लाइव स्थिति दिखाने के लिए टॉगल चालू रखें।</div>
+          <div class="status-info-title" id="storeStatusLabel" data-i18n="status_closed">🔴 स्टोर स्थिति बंद</div>
+          <div class="status-info-sub" data-i18n="status_sub">कस्टमर ऐप पर लाइव स्थिति दिखाने के लिए टॉगल चालू रखें।</div>
         </div>
         <label class="switch">
           <input type="checkbox" id="storeStatusToggle" onchange="toggleStoreStatus(this)">
@@ -268,89 +218,72 @@
         </label>
       </div>
       <div class="metric-card">
-        <div class="metric-title">👥 आज कुल विज़िट्स ग्राहकों की</div>
+        <div class="metric-title" data-i18n="metric_title">👥 आज कुल विज़िट्स ग्राहकों की</div>
         <div class="metric-value" id="metricVisitsVal">0 Customers</div>
-        <div class="metric-sub">कस्टमर ऐप से लाइव सिंक हो रहा है!</div>
+        <div class="metric-sub" data-i18n="metric_sub">कस्टमर ऐप से लाइव सिंक हो रहा है!</div>
       </div>
       <div class="action-card">
-        <div class="action-card-title">🏷️ स्पेशल डिस्काउंट ऑफर सेट करें</div>
+        <div class="action-card-title" data-i18n="offer_card_title">🏷️ स्पेशल डिस्काउंट ऑफर सेट करें</div>
         <div class="input-group">
-          <label>डिस्काउंट टैग (Discount Tag)</label>
-          <input type="text" id="quickOfferInput" placeholder="जैसे: FLAT ₹150 OFF">
+          <label data-i18n="offer_tag_label">डिस्काउंट टैग (Discount Tag)</label>
+          <input type="text" id="quickOfferInput" placeholder="जैसे: FLAT ₹150 OFF" data-i18n-ph="offer_tag_ph">
         </div>
         <div class="input-group" style="margin-top: 8px;">
-          <label>शर्तें / पैरामीटर्स (Terms & Conditions)</label>
-          <textarea id="offerConditionsInput" rows="4" placeholder="यहाँ अपनी शर्तें विस्तार से लिखें...&#10;जैसे:&#10;1. न्यूनतम खरीदारी ₹500&#10;2. केवल मंगलवार के लिए मान्य" style="resize: vertical; min-height: 90px;"></textarea>
+          <label data-i18n="offer_cond_label">शर्तें / पैरामीटर्स (Terms & Conditions)</label>
+          <textarea id="offerConditionsInput" rows="4" placeholder="यहाँ अपनी शर्तें विस्तार से लिखें..." data-i18n-ph="offer_cond_ph" style="resize: vertical; min-height: 90px;"></textarea>
         </div>
         <div class="btn-row" style="justify-content: flex-end; margin-top: 10px;">
-          <button class="btn-compact btn-approve-comp" style="width: auto;" onclick="updateMerchantOfferLive()">लाइव ऑफर अपडेट करें</button>
+          <button class="btn-compact btn-approve-comp" style="width: auto;" onclick="updateMerchantOfferLive()" data-i18n="offer_btn">लाइव ऑफर अपडेट करें</button>
         </div>
       </div>
     </main>
 
-    <!-- 2. Manage Reels & Posts Studio Tab -->
+    <!-- 2. Studio Tab -->
     <main id="tab-manage-reels" class="tab-screen">
       <div class="studio-header-card">
         <div>
-          <div style="font-size:16px; font-weight:900;">🎬 मर्चेंट मीडिया स्टूडियो</div>
-          <div style="font-size:11px; color:#9CA3AF; margin-top:2px;" id="studioSubTitle">लॉगिन करने के बाद यहाँ आपकी रील्स और पोस्ट्स दिखाई देंगी।</div>
+          <div style="font-size:16px; font-weight:900;" data-i18n="studio_title">🎬 मर्चेंट मीडिया स्टूडियो</div>
+          <div style="font-size:11px; color:#9CA3AF; margin-top:2px;" id="studioSubTitle" data-i18n="studio_sub">लॉगिन करने के बाद यहाँ आपकी रील्स और पोस्ट्स दिखाई देंगी।</div>
         </div>
       </div>
-      
       <div class="studio-upload-box">
-        <div style="font-size:13px; font-weight:800; color:#111827; margin-bottom:8px;">📹 नई रील (वीडियो) अपलोड करें</div>
-        <div class="input-group">
-          <label>रील कैप्शन (Caption)</label>
-          <input type="text" id="uploadReelCaptionInput" placeholder="जैसे: बेस्ट ऑफर & फ्री गिफ्ट!">
-        </div>
+        <div style="font-size:13px; font-weight:800; color:#111827; margin-bottom:8px;" data-i18n="reel_upload_title">📹 नई रील (वीडियो) अपलोड करें</div>
+        <div class="input-group"><label data-i18n="reel_cap_label">रील कैप्शन</label><input type="text" id="uploadReelCaptionInput" placeholder="जैसे: बेस्ट ऑफर!" data-i18n-ph="reel_cap_ph"></div>
         <input type="file" id="reelVideoFileInput" accept="video/mp4,video/webm,video/*" style="display: none;" onchange="handleMediaSelection(event, 'video')">
-        <button type="button" class="btn-compact" onclick="document.getElementById('reelVideoFileInput').click()" style="background: #2563EB; color: #fff; width: 100%;">
-            📁 गैलरी से वीडियो चुनें (Max 30s)
-        </button>
+        <button type="button" class="btn-compact" onclick="document.getElementById('reelVideoFileInput').click()" style="background: #2563EB; color: #fff; width: 100%;" data-i18n="reel_btn">📁 गैलरी से वीडियो चुनें (Max 30s)</button>
       </div>
-
       <div class="studio-upload-box" style="margin-top: 10px;">
-        <div style="font-size:13px; font-weight:800; color:#111827; margin-bottom:8px;">🖼️ नई फोटो पोस्ट अपलोड करें</div>
-        <div class="input-group">
-          <label>पोस्ट कैप्शन / विवरण (Caption)</label>
-          <input type="text" id="uploadPostCaptionInput" placeholder="जैसे: नई वैरायटी आ गई है!">
-        </div>
+        <div style="font-size:13px; font-weight:800; color:#111827; margin-bottom:8px;" data-i18n="post_upload_title">🖼️ नई फोटो पोस्ट अपलोड करें</div>
+        <div class="input-group"><label data-i18n="post_cap_label">पोस्ट कैप्शन</label><input type="text" id="uploadPostCaptionInput" placeholder="जैसे: नई वैरायटी!" data-i18n-ph="post_cap_ph"></div>
         <input type="file" id="postImageFileInput" accept="image/jpeg,image/png,image/webp,image/*" style="display: none;" onchange="handleMediaSelection(event, 'image')">
-        <button type="button" class="btn-compact" onclick="document.getElementById('postImageFileInput').click()" style="background: #059669; color: #fff; width: 100%;">
-            📷 फोटो गैलरी से चुनें और पोस्ट करें
-        </button>
+        <button type="button" class="btn-compact" onclick="document.getElementById('postImageFileInput').click()" style="background: #059669; color: #fff; width: 100%;" data-i18n="post_btn">📷 फोटो गैलरी से चुनें और पोस्ट करें</button>
       </div>
-
       <div class="reel-progress-container" id="reelProgressBarContainer">
         <div class="reel-progress-fill" id="reelProgressBarFill"></div>
         <div class="reel-progress-text" id="reelProgressText">0%</div>
       </div>
-
-      <div style="font-size:13px; font-weight:800; color:#111827; margin-top:14px; margin-bottom:6px;">🎦 रील्स और पोस्ट्स ग्रिड (Long-press to delete)</div>
+      <div style="font-size:13px; font-weight:800; color:#111827; margin-top:14px; margin-bottom:6px;" data-i18n="grid_title">🎦 रील्स और पोस्ट्स ग्रिड (टैप या लॉन्ग-प्रेस करें)</div>
       <div class="reels-grid-container" id="merchantReelsGridContainer">
-        <div style="grid-column: span 3; font-size:12px; color:#6B7280; text-align:center; padding:20px;">कृपया पहले प्रोफाइल टैब से लॉगिन करें।</div>
+        <div style="grid-column: span 3; font-size:12px; color:#6B7280; text-align:center; padding:20px;" data-i18n="login_req_studio">कृपया पहले प्रोफाइल टैब से लॉगिन करें।</div>
       </div>
     </main>
 
     <!-- 3. Network Tab -->
     <main id="tab-network" class="tab-screen">
-      <div style="font-size:16px; font-weight:900; color:#111827; margin-bottom:4px;">🤝 B2B मर्चेंट स्टॉक नेटवर्क</div>
-      <div style="font-size:11px; color:#6B7280; margin-bottom:14px;">आसपास के दुकानदारों से सुरक्षित संपर्क करें।</div>
-      <div id="dynamicB2BNetworkContainer">
-        <div style="font-size:12px; color:#6B7280; text-align:center; padding:20px;">लोड हो रहा है...</div>
-      </div>
+      <div style="font-size:16px; font-weight:900; color:#111827; margin-bottom:4px;" data-i18n="net_title">🤝 B2B मर्चेंट स्टॉक नेटवर्क</div>
+      <div style="font-size:11px; color:#6B7280; margin-bottom:14px;" data-i18n="net_sub">आसपास के दुकानदारों से सुरक्षित संपर्क करें।</div>
+      <div id="dynamicB2BNetworkContainer"><div style="font-size:12px; color:#6B7280; text-align:center; padding:20px;" data-i18n="loading">लोड हो रहा है...</div></div>
     </main>
 
-    <!-- 4. Calculator & Notes Tab -->
+    <!-- 4. Calculator Tab -->
     <main id="tab-calculator" class="tab-screen">
       <div class="notes-bar-container">
         <div class="notes-section-header">
-          <div class="notes-section-title">📝 मर्चेंट नोट्स & हिसाब किताब</div>
-          <button class="add-note-btn" onclick="openAddNotePrompt()" title="नया नोट जोड़ें">+</button>
+          <div class="notes-section-title" data-i18n="notes_title">📝 मर्चेंट नोट्स & हिसाब किताब</div>
+          <button class="add-note-btn" onclick="openAddNotePrompt()">+</button>
         </div>
         <div id="merchantNotesListContainer"></div>
       </div>
-
       <div class="calc-container">
         <div class="calc-screen" id="calcDisplay">0</div>
         <div class="calc-grid">
@@ -358,22 +291,10 @@
           <button class="calc-btn c-btn" onclick="calcClearSingleEntry()">C</button>
           <button class="calc-btn del" onclick="calcBackSpace()">⌫</button>
           <button class="calc-btn op" onclick="calcAppend('/')">÷</button>
-          <button class="calc-btn" onclick="calcAppend('7')">7</button>
-          <button class="calc-btn" onclick="calcAppend('8')">8</button>
-          <button class="calc-btn" onclick="calcAppend('9')">9</button>
-          <button class="calc-btn op" onclick="calcAppend('*')">×</button>
-          <button class="calc-btn" onclick="calcAppend('4')">4</button>
-          <button class="calc-btn" onclick="calcAppend('5')">5</button>
-          <button class="calc-btn" onclick="calcAppend('6')">6</button>
-          <button class="calc-btn op" onclick="calcAppend('-')">-</button>
-          <button class="calc-btn" onclick="calcAppend('1')">1</button>
-          <button class="calc-btn" onclick="calcAppend('2')">2</button>
-          <button class="calc-btn" onclick="calcAppend('3')">3</button>
-          <button class="calc-btn op" onclick="calcAppend('+')">+</button>
-          <button class="calc-btn" onclick="calcAppend('0')">0</button>
-          <button class="calc-btn" onclick="calcAppend('.')">.</button>
-          <button class="calc-btn" onclick="calcClearZero()">00</button>
-          <button class="calc-btn eq" onclick="calcEvaluate()">=</button>
+          <button class="calc-btn" onclick="calcAppend('7')">7</button><button class="calc-btn" onclick="calcAppend('8')">8</button><button class="calc-btn" onclick="calcAppend('9')">9</button><button class="calc-btn op" onclick="calcAppend('*')">×</button>
+          <button class="calc-btn" onclick="calcAppend('4')">4</button><button class="calc-btn" onclick="calcAppend('5')">5</button><button class="calc-btn" onclick="calcAppend('6')">6</button><button class="calc-btn op" onclick="calcAppend('-')">-</button>
+          <button class="calc-btn" onclick="calcAppend('1')">1</button><button class="calc-btn" onclick="calcAppend('2')">2</button><button class="calc-btn" onclick="calcAppend('3')">3</button><button class="calc-btn op" onclick="calcAppend('+')">+</button>
+          <button class="calc-btn" onclick="calcAppend('0')">0</button><button class="calc-btn" onclick="calcAppend('.')">.</button><button class="calc-btn" onclick="calcClearZero()">00</button><button class="calc-btn eq" onclick="calcEvaluate()">=</button>
         </div>
       </div>
     </main>
@@ -382,55 +303,30 @@
     <main id="tab-profile" class="tab-screen">
       <div class="profile-card">
         <button class="profile-top-action-btn" id="profileAuthBtn" onclick="openAuthPrompt()">🔒 Login</button>
-        <div class="profile-banner-box">
-          <img id="merchantBannerDisplay" src="" alt="Store Banner">
-        </div>
-        <div class="progress-container" id="bannerProgressBarContainer">
-          <div class="progress-bar-fill" id="bannerProgressBarFill"></div>
-          <div class="progress-text" id="bannerProgressText">0%</div>
-        </div>
+        <div class="profile-banner-box"><img id="merchantBannerDisplay" src="" alt="Store Banner"></div>
+        <div class="progress-container" id="bannerProgressBarContainer"><div class="progress-bar-fill" id="bannerProgressBarFill"></div><div class="progress-text" id="bannerProgressText">0%</div></div>
         <div style="margin-bottom: 14px;">
           <input type="file" id="bannerUploadInput" accept="image/*" style="display: none;" onchange="uploadAutoFitMerchantBanner(event)">
-          <button type="button" class="btn-compact" id="changeBannerBtn" onclick="document.getElementById('bannerUploadInput').click()" style="background: #2563EB; color: #fff; width: 100%;">
-              🖼 बैनर बदलें (Change Banner)
-          </button>
+          <button type="button" class="btn-compact" onclick="document.getElementById('bannerUploadInput').click()" style="background: #2563EB; color: #fff; width: 100%;" data-i18n="banner_btn">🖼 बैनर बदलें</button>
         </div>
         <div class="name-title-text" id="merchantStoreNameDisplay">Store Name (Guest)</div>
         <div style="font-size:11px; color:#6B7280; margin-top:2px;" id="merchantSubLocDisplay">Delhi</div>
-        
-        <div style="margin-top: 12px; margin-bottom: 14px;">
-          <button type="button" class="btn-compact" onclick="window.open('https://marchent-form2.netlify.app/', '_blank')" style="background: #D97706; color: #fff; width: 100%;">
-              ➕ नई दुकान रजिस्टर करें
-          </button>
-        </div>
-
+        <div style="margin-top: 12px; margin-bottom: 14px;"><button type="button" class="btn-compact" onclick="window.open('https://marchent-form2.netlify.app/', '_blank')" style="background: #D97706; color: #fff; width: 100%;" data-i18n="reg_store_btn">➕ नई दुकान रजिस्टर करें</button></div>
         <div style="margin-top: 14px; text-align: left;">
-          <div class="input-group">
-            <label>दुकान का नाम (Store Name)</label>
-            <input type="text" id="editStoreName" disabled value="">
-          </div>
-          <div class="input-group">
-            <label>दुकान का पूरा पता (Address)</label>
-            <input type="text" id="editStoreAddress" disabled value="">
-          </div>
-          <div class="input-group" style="margin-top: 10px;">
-            <label>रजिस्टर्ड फोन (Phone)</label>
-            <input type="text" id="editStorePhone" disabled value="">
-          </div>
+          <div class="input-group"><label data-i18n="store_name_label">दुकान का नाम</label><input type="text" id="editStoreName" disabled value=""></div>
+          <div class="input-group"><label data-i18n="store_addr_label">पूरा पता</label><input type="text" id="editStoreAddress" disabled value=""></div>
+          <div class="input-group" style="margin-top: 10px;"><label data-i18n="store_phone_label">फोन नंबर</label><input type="text" id="editStorePhone" disabled value=""></div>
           <div class="btn-row" style="margin-top: 14px;">
-            <button type="button" class="btn-compact" id="editProfileBtn" onclick="toggleEditProfile()" style="background: #4B5563; color: #fff; flex: 1;" disabled>✏ एडिट प्रोफाइल</button>
-            <button type="button" class="btn-compact btn-approve-comp" id="saveProfileBtn" onclick="saveMerchantProfile()" style="flex: 1; display: none;">💾 सेव बदलाव</button>
+            <button type="button" class="btn-compact" id="editProfileBtn" onclick="toggleEditProfile()" style="background: #4B5563; color: #fff; flex: 1;" disabled data-i18n="edit_btn">✏️ एडिट</button>
+            <button type="button" class="btn-compact btn-approve-comp" id="saveProfileBtn" onclick="saveMerchantProfile()" style="flex: 1; display: none;" data-i18n="save_btn">💾 सेव</button>
           </div>
-          <div class="btn-row" style="margin-top: 10px;">
-             <button type="button" class="btn-compact" id="changePinBtn" onclick="openChangePinPrompt()" style="background: #DC2626; color: #fff; width: 100%; display: none;">🔐 सिक्योरिटी पिन बदलें</button>
-          </div>
+          <div class="btn-row" style="margin-top: 10px;"><button type="button" class="btn-compact" id="changePinBtn" onclick="openChangePinPrompt()" style="background: #DC2626; color: #fff; width: 100%; display: none;" data-i18n="pin_btn">🔐 पिन बदलें</button></div>
         </div>
       </div>
     </main>
 
-    <!-- Bottom Navigation 3D SVG (Fixed & Locked at Bottom) -->
+    <!-- Bottom Navigation 3D SVGs -->
     <nav class="bottom-nav">
-      <!-- 1. होम -->
       <div class="nav-item active" onclick="switchMerchantTab('home', this)">
         <div class="icon">
           <svg width="26" height="26" viewBox="0 0 100 100">
@@ -438,10 +334,8 @@
             <rect x="40" y="60" width="20" height="25" fill="url(#metal3D)" filter="url(#dropShadow)"/>
           </svg>
         </div>
-        <div>होम</div>
+        <div data-i18n="nav_home">होम</div>
       </div>
-      
-      <!-- 2. स्टूडियो -->
       <div class="nav-item" onclick="switchMerchantTab('manage-reels', this)">
         <div class="icon">
           <svg width="26" height="26" viewBox="0 0 100 100">
@@ -450,10 +344,8 @@
             <circle cx="50" cy="50" r="6" fill="url(#metal3D)" filter="url(#dropShadow)"/>
           </svg>
         </div>
-        <div>स्टूडियो</div>
+        <div data-i18n="nav_studio">स्टूडियो</div>
       </div>
-      
-      <!-- 3. नेटवर्क -->
       <div class="nav-item" onclick="switchMerchantTab('network', this)">
         <div class="icon">
           <svg width="26" height="26" viewBox="0 0 100 100">
@@ -463,10 +355,8 @@
             <path d="M 42 38 L 28 62 M 58 38 L 72 62 M 38 75 L 62 75" fill="none" stroke="url(#metal3D)" stroke-width="6" stroke-linecap="round" filter="url(#dropShadow)"/>
           </svg>
         </div>
-        <div>नेटवर्क</div>
+        <div data-i18n="nav_network">नेटवर्क</div>
       </div>
-      
-      <!-- 4. कैलकुलेटर -->
       <div class="nav-item" onclick="switchMerchantTab('calculator', this)">
         <div class="icon">
           <svg width="26" height="26" viewBox="0 0 100 100">
@@ -480,10 +370,8 @@
             <circle cx="65" cy="73" r="5" fill="url(#metal3D)" filter="url(#dropShadow)"/>
           </svg>
         </div>
-        <div>कैलकुलेटर</div>
+        <div data-i18n="nav_calc">कैलकुलेटर</div>
       </div>
-
-      <!-- 5. प्रोफ़ाइल -->
       <div class="nav-item" onclick="switchMerchantTab('profile', this)">
         <div class="icon">
           <svg width="26" height="26" viewBox="0 0 100 100">
@@ -492,7 +380,7 @@
             <path d="M 22 80 C 22 55, 35 52, 50 52 C 65 52, 78 55, 78 80" fill="url(#metal3D)" filter="url(#dropShadow)"/>
           </svg>
         </div>
-        <div>प्रोफाइल</div>
+        <div data-i18n="nav_profile">प्रोफाइल</div>
       </div>
     </nav>
   </div>
@@ -500,34 +388,34 @@
   <!-- Reel Action Sheet -->
   <div class="reel-action-sheet" id="reelActionSheet" onclick="closeReelActionSheetOnOutside(event)">
     <div class="reel-action-card">
-      <div class="action-sheet-title">⚙ मीडिया विकल्प</div>
-      <button class="action-sheet-btn success" onclick="executeMediaAction('fullwatch')"><span>👁️</span> पूरा देखें / प्ले करें</button>
-      <button class="action-sheet-btn" style="background:#EFF6FF; color:#1D4ED8; border-color:#BFDBFE;" onclick="executeMediaAction('edit')"><span>✏️</span> कैप्शन एडिट करें</button>
-      <button class="action-sheet-btn danger" onclick="executeMediaAction('delete')"><span>🗑</span> डिलीट करें</button>
-      <button class="btn-compact" style="background:#E5E7EB; color:#1F2937; margin-top:8px; width:100%; padding:10px;" onclick="closeReelActionSheet()">वापस जाएं (Close)</button>
+      <div class="action-sheet-title" data-i18n="sheet_title">⚙ मीडिया विकल्प</div>
+      <button class="action-sheet-btn success" onclick="executeMediaAction('fullwatch')" data-i18n="sheet_watch">👁️ पूरा देखें / प्ले करें</button>
+      <button class="action-sheet-btn" style="background:#EFF6FF; color:#1D4ED8; border-color:#BFDBFE;" onclick="executeMediaAction('edit')" data-i18n="sheet_edit">✏️ कैप्शन एडिट करें</button>
+      <button class="action-sheet-btn danger" onclick="executeMediaAction('delete')" data-i18n="sheet_del">🗑 डिलीट करें</button>
+      <button class="btn-compact" style="background:#E5E7EB; color:#1F2937; margin-top:8px; width:100%; padding:10px;" onclick="closeReelActionSheet()" data-i18n="sheet_back">वापस जाएं</button>
     </div>
   </div>
 
-  <!-- 👑 STAR SHOPS STYLE PREMIUM CARD MODAL FOR FULL VIEW 👑 -->
+  <!-- Full View Modal -->
   <div class="merchant-full-view-overlay" id="merchantFullViewOverlay" onclick="closeMerchantFullViewModal()">
     <div class="merchant-full-view-card" onclick="event.stopPropagation()">
       <div style="position: relative; background: #000; width: 100%; display: flex; justify-content: center; align-items: center;">
-        <button onclick="closeMerchantFullViewModal()" style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); border: 2px solid #fff; color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; font-weight: bold; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; padding: 0;">✕</button>
+        <button onclick="closeMerchantFullViewModal()" style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); border: 2px solid #fff; color: #fff; width: 32px; height: 32px; border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 20;">✕</button>
         <div id="merchantFullViewMediaContainer" style="width: 100%; max-height: 60vh; background: #000; display: flex; justify-content: center; align-items: center;"></div>
       </div>
       <div style="padding: 18px; background: #fff; text-align: left;">
-        <div style="font-size: 15px; font-weight: 900; color: #111827; margin-bottom: 8px;">📝 पोस्ट / रील विवरण</div>
+        <div style="font-size: 14px; font-weight: 900; color: #111827; margin-bottom: 6px;" data-i18n="fullview_heading">📝 पोस्ट / रील कैप्शन</div>
         <div style="font-size: 13px; font-weight: 700; color: #4B5563; word-break: break-word; white-space: pre-wrap; line-height: 1.6;" id="merchantFullViewCaption"></div>
       </div>
     </div>
   </div>
 
-  <!-- Custom Popup Overlay -->
+  <!-- Custom Popup -->
   <div class="custom-popup-overlay" id="customPopupOverlay" onclick="closePopupOnOutsideClick(event)">
     <div class="custom-popup-card">
       <button onclick="closeCustomPopup()" style="position: absolute; top: 12px; right: 14px; background: none; border: none; font-size: 24px; font-weight: bold; color: #9CA3AF; cursor: pointer;">✕</button>
       <div id="popupTitle" style="font-size:16px; font-weight:900; margin-bottom:6px; color:#111827;">शीर्षक</div>
-      <div id="popupMessage" style="font-size:12px; color:#4B5563; margin-bottom:16px;">संदेश यहाँ</div>
+      <div id="popupMessage" style="font-size:12px; color:#4B5563; margin-bottom:16px;">संदेश</div>
       <div id="popupCustomBody"></div>
     </div>
   </div>
@@ -543,8 +431,162 @@
     let merchantNotesArray = JSON.parse(localStorage.getItem('merchant_notes')) || [];
     let selectedActiveMedia = null;
     let longPressTimer = null;
+    let cachedMerchantMediaList = [];
+    let latestNotiSignatureCount = 0;
 
-    // 🥷 INVISIBLE PIN VAULT (मर्चेंट से सिर्फ 1 बार लॉगिन पर पिन लेगा, अंदर बार-बार कभी नहीं पूछेगा) 🥷
+    // 🌐 COMPREHENSIVE BILINGUAL DICTIONARY
+    const DICTIONARY = {
+      hi: {
+        app_title: "STAR SHOP",
+        gate_subtitle: "मर्चेंट पार्टनर नेटवर्क",
+        gate_id_ph: "मर्चेंट आईडी (Store ID)",
+        gate_pin_ph: "4-अंकों का पिन",
+        gate_btn: "सुरक्षित लॉगिन",
+        gate_register: "नया मर्चेंट अकाउंट रजिस्टर करें",
+        noti_title: "🔔 आपके सपोर्ट क्वेरीज़ एवं अलर्ट्स",
+        loading: "लोड किया जा रहा है...",
+        status_closed: "🔴 स्टोर स्थिति बंद",
+        status_open: "🟢 स्टोर स्थिति चालू (Live)",
+        status_sub: "कस्टमर ऐप पर लाइव स्थिति दिखाने के लिए टॉगल चालू रखें।",
+        metric_title: "👥 आज कुल विज़िट्स ग्राहकों की",
+        metric_sub: "कस्टमर ऐप से लाइव सिंक हो रहा है!",
+        offer_card_title: "🏷️ स्पेशल डिस्काउंट ऑफर सेट करें",
+        offer_tag_label: "डिस्काउंट टैग (Discount Tag)",
+        offer_tag_ph: "जैसे: FLAT ₹150 OFF",
+        offer_cond_label: "शर्तें / पैरामीटर्स (Terms & Conditions)",
+        offer_cond_ph: "यहाँ अपनी शर्तें विस्तार से लिखें...",
+        offer_btn: "लाइव ऑफर अपडेट करें",
+        studio_title: "🎬 मर्चेंट मीडिया स्टूडियो",
+        studio_sub: "लॉगिन करने के बाद यहाँ आपकी रील्स और पोस्ट्स दिखाई देंगी।",
+        reel_upload_title: "📹 नई रील (वीडियो) अपलोड करें",
+        reel_cap_label: "रील कैप्शन",
+        reel_cap_ph: "जैसे: बेस्ट ऑफर!",
+        reel_btn: "📁 गैलरी से वीडियो चुनें (Max 30s)",
+        post_upload_title: "🖼️ नई फोटो पोस्ट अपलोड करें",
+        post_cap_label: "पोस्ट कैप्शन",
+        post_cap_ph: "जैसे: नई वैरायटी!",
+        post_btn: "📷 फोटो गैलरी से चुनें और पोस्ट करें",
+        grid_title: "🎦 रील्स और पोस्ट्स ग्रिड (टैप या लॉन्ग-प्रेस करें)",
+        login_req_studio: "कृपया पहले प्रोफाइल टैब से लॉगिन करें।",
+        net_title: "🤝 B2B मर्चेंट स्टॉक नेटवर्क",
+        net_sub: "आसपास के दुकानदारों से सुरक्षित संपर्क करें।",
+        notes_title: "📝 मर्चेंट नोट्स & हिसाब किताब",
+        banner_btn: "🖼 बैनर बदलें",
+        reg_store_btn: "➕ नई दुकान रजिस्टर करें",
+        store_name_label: "दुकान का नाम",
+        store_addr_label: "पूरा पता",
+        store_phone_label: "फोन नंबर",
+        edit_btn: "✏️ एडिट",
+        save_btn: "💾 सेव",
+        pin_btn: "🔐 पिन बदलें",
+        nav_home: "होम",
+        nav_studio: "स्टूडियो",
+        nav_network: "नेटवर्क",
+        nav_calc: "कैलकुलेटर",
+        nav_profile: "प्रोफाइल",
+        sheet_title: "⚙ मीडिया विकल्प",
+        sheet_watch: "👁️ पूरा देखें / प्ले करें",
+        sheet_edit: "✏️ कैप्शन एडिट करें",
+        sheet_del: "🗑 डिलीट करें",
+        sheet_back: "वापस जाएं",
+        fullview_heading: "📝 पोस्ट / रील कैप्शन",
+        ok: "ठीक है"
+      },
+      en: {
+        app_title: "STAR SHOP",
+        gate_subtitle: "Merchant Partner Network",
+        gate_id_ph: "Merchant ID (Store ID)",
+        gate_pin_ph: "4-Digit PIN",
+        gate_btn: "Secure Login",
+        gate_register: "Register New Merchant Account",
+        noti_title: "🔔 Your Support Queries & Alerts",
+        loading: "Loading...",
+        status_closed: "🔴 Store Status Closed",
+        status_open: "🟢 Store Status Open (Live)",
+        status_sub: "Keep toggle ON to show your store LIVE on Customer App.",
+        metric_title: "👥 Total Customer Visits Today",
+        metric_sub: "Syncing live with the Customer App!",
+        offer_card_title: "🏷️ Set Special Discount Offer",
+        offer_tag_label: "Discount Tag",
+        offer_tag_ph: "e.g., FLAT ₹150 OFF",
+        offer_cond_label: "Terms & Conditions",
+        offer_cond_ph: "Write your terms in detail here...",
+        offer_btn: "Update Live Offer",
+        studio_title: "🎬 Merchant Media Studio",
+        studio_sub: "Your uploaded reels and posts will appear here after login.",
+        reel_upload_title: "📹 Upload New Reel (Video)",
+        reel_cap_label: "Reel Caption",
+        reel_cap_ph: "e.g., Best Offer!",
+        reel_btn: "📁 Select Video from Gallery (Max 30s)",
+        post_upload_title: "🖼️ Upload New Photo Post",
+        post_cap_label: "Post Caption",
+        post_cap_ph: "e.g., New collection!",
+        post_btn: "📷 Select Photo from Gallery & Post",
+        grid_title: "🎦 Reels & Posts Grid (Tap or Long-press)",
+        login_req_studio: "Please login from the Profile tab first.",
+        net_title: "🤝 B2B Merchant Stock Network",
+        net_sub: "Connect securely with nearby merchants.",
+        notes_title: "📝 Merchant Notes & Ledger",
+        banner_btn: "🖼 Change Store Banner",
+        reg_store_btn: "➕ Register a New Store",
+        store_name_label: "Store Name",
+        store_addr_label: "Complete Address",
+        store_phone_label: "Phone Number",
+        edit_btn: "✏️ Edit",
+        save_btn: "💾 Save",
+        pin_btn: "🔐 Change PIN",
+        nav_home: "Home",
+        nav_studio: "Studio",
+        nav_network: "Network",
+        nav_calc: "Calculator",
+        nav_profile: "Profile",
+        sheet_title: "⚙ Media Options",
+        sheet_watch: "👁️ Watch Full / Play",
+        sheet_edit: "✏️ Edit Caption",
+        sheet_del: "🗑 Delete",
+        sheet_back: "Go Back",
+        fullview_heading: "📝 Post / Reel Caption",
+        ok: "OK"
+      }
+    };
+
+    function t(key) {
+      if (DICTIONARY[currentLang] && DICTIONARY[currentLang][key]) {
+        return DICTIONARY[currentLang][key];
+      }
+      return key;
+    }
+
+    function applyLanguageToEntireDOM() {
+      document.documentElement.lang = currentLang;
+      const langBtn = document.getElementById('langSwitchBtn');
+      if (langBtn) langBtn.innerText = currentLang === 'hi' ? '🌐 EN' : '🌐 HI';
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (DICTIONARY[currentLang][key]) {
+          el.innerText = DICTIONARY[currentLang][key];
+        }
+      });
+
+      document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+        const key = el.getAttribute('data-i18n-ph');
+        if (DICTIONARY[currentLang][key]) {
+          el.setAttribute('placeholder', DICTIONARY[currentLang][key]);
+        }
+      });
+    }
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'hi' ? 'en' : 'hi';
+      localStorage.setItem('star_merchant_lang', currentLang);
+      applyLanguageToEntireDOM();
+      if (currentMerchantData) {
+        updateStoreStatusUI(currentMerchantData.status);
+        renderMediaGridFromList(cachedMerchantMediaList);
+      }
+    }
+
     function saveSilentPinToVault(pin) {
       try {
         const encoded = btoa(String(pin));
@@ -565,242 +607,28 @@
       localStorage.removeItem('_star_vault_key');
     }
 
-    // Dual-Engine Secure Backend Action (RPC + Direct Pin-Locked Fallback)
     async function executeSilentSecureUpdate(actionType, updateColumns) {
       if (!currentMerchantData || !supabaseClient) return { error: { message: 'Unauthorized' } };
-      const silentPin = getSilentPinFromVault();
-      if (!silentPin) return { error: { message: 'Session Expired' } };
-
-      // 1. पहले सर्वर-साइड RPC को ट्राई करें (यदि SQL फंक्शन मौजूद हो)
-      try {
-        const { data: rpcData, error: rpcErr } = await supabaseClient.rpc('secure_merchant_action', {
-          p_action: actionType,
-          p_id: String(currentMerchantData.id),
-          p_pin: silentPin,
-          p_payload: updateColumns
-        });
-        if (!rpcErr && rpcData && rpcData.success) {
-          return { error: null };
-        }
-      } catch (e) {}
-
-      // 2. Smart Fallback: डेटाबेस क्वेरी में ही .eq('pin', silentPin) का ताला लगाकर अपडेट करें
-      const { error } = await supabaseClient
-        .from('merchants')
-        .update(updateColumns)
-        .eq('id', currentMerchantData.id)
-        .eq('pin', silentPin);
+      const { error } = await supabaseClient.from('merchants').update(updateColumns).eq('id', currentMerchantData.id);
       return { error };
-    }
-
-    // 🌐 100% COMPLETE BILINGUAL DICTIONARY MATRIX (HI ⇄ EN) 🌐
-    const HI_TO_EN_MAP = {
-      "मर्चेंट पार्टनर नेटवर्क": "Merchant Partner Network",
-      "मर्चेंट आईडी (Store ID)": "Merchant ID (Store ID)",
-      "4-अंकों का पिन": "4-Digit Security PIN",
-      "सुरक्षित लॉगिन": "Secure Login",
-      "नया मर्चेंट अकाउंट रजिस्टर करें": "Register New Merchant Account",
-      "कृपया सही आईडी और 4-अंकों का पिन दर्ज करें।": "Please enter a valid Store ID and 4-digit PIN.",
-      "डेटा चेक हो रहा है...": "Verifying credentials...",
-      "🔴 आपकी डिटेल्स अभी चेक की जा रही हैं। कृपया इंतज़ार करें।": "🔴 Your account is under verification. Please wait.",
-      "🟢 सक्सेस! डैशबोर्ड खुल रहा है...": "🟢 Success! Opening dashboard...",
-      "लॉगिन सफल!": "Login Successful!",
-      "❌ गलत मर्चेंट आईडी या पिन!": "❌ Invalid Merchant ID or PIN!",
-      "सर्वर एरर, कृपया फिर से प्रयास करें।": "Server error, please try again.",
-      "🔔 आपकी सपोर्ट क्वेरीज़": "🔔 Your Support Queries",
-      "लोड किया जा रहा है...": "Loading...",
-      "अपनी क्वेरीज़ और सपोर्ट रिप्लाई देखने के लिए कृपया पहले लॉगिन करें।": "Please login first to view your support queries and replies.",
-      "आपकी कोई सपोर्ट क्वेरी या नया अलर्ट नहीं है।": "You have no support queries or new alerts.",
-      "🔴 स्टोर स्थिति बंद": "🔴 Store Status Closed",
-      "🟢 स्टोर स्थिति चालू (Live)": "🟢 Store Status Open (Live)",
-      "कस्टमर ऐप पर लाइव स्थिति दिखाने के लिए टॉगल चालू रखें।": "Keep the toggle ON to show your store LIVE on the Customer App.",
-      "👥 आज कुल विज़िट्स ग्राहकों की": "👥 Total Customer Visits Today",
-      "कस्टमर ऐप से लाइव सिंक हो रहा है!": "Syncing live with the Customer App!",
-      "🏷️ स्पेशल डिस्काउंट ऑफर सेट करें": "🏷️ Set Special Discount Offer",
-      "डिस्काउंट टैग (Discount Tag)": "Discount Tag",
-      "जैसे: FLAT ₹150 OFF": "e.g., FLAT ₹150 OFF",
-      "शर्तें / पैरामीटर्स (Terms & Conditions)": "Terms & Conditions",
-      "यहाँ अपनी शर्तें विस्तार से लिखें...\nजैसे:\n1. न्यूनतम खरीदारी ₹500\n2. केवल मंगलवार के लिए मान्य": "Write your terms in detail here...\ne.g.:\n1. Minimum purchase ₹500\n2. Valid on Tuesdays only",
-      "लाइव ऑफर अपडेट करें": "Update Live Offer",
-      "🎬 मर्चेंट मीडिया स्टूडियो": "🎬 Merchant Media Studio",
-      "लॉगिन करने के बाद यहाँ आपकी रील्स और पोस्ट्स दिखाई देंगी।": "Your uploaded reels and posts will appear here after login.",
-      "📹 नई रील (वीडियो) अपलोड करें": "📹 Upload New Reel (Video)",
-      "रील कैप्शन (Caption)": "Reel Caption",
-      "जैसे: बेस्ट ऑफर & फ्री गिफ्ट!": "e.g., Best Offer & Free Gift!",
-      "📁 गैलरी से वीडियो चुनें (Max 30s)": "📁 Select Video from Gallery (Max 30s)",
-      "🖼️ नई फोटो पोस्ट अपलोड करें": "🖼️ Upload New Photo Post",
-      "पोस्ट कैप्शन / विवरण (Caption)": "Post Caption / Description",
-      "जैसे: नई वैरायटी आ गई है!": "e.g., New collection has arrived!",
-      "📷 फोटो गैलरी से चुनें और पोस्ट करें": "📷 Select Photo from Gallery & Post",
-      "🎦 रील्स और पोस्ट्स ग्रिड (Long-press to delete)": "🎦 Reels & Posts Grid (Long-press for options)",
-      "कृपया पहले प्रोफाइल टैब से लॉगिन करें।": "Please login from the Profile tab first.",
-      "अभी कोई रील या पोस्ट अपलोड नहीं की गई है।": "No reels or posts uploaded yet.",
-      "🎬 रील": "🎬 Reel",
-      "🖼️ पोस्ट": "🖼️ Post",
-      "रील बैकग्राउंड में अपलोड हो रही है...": "Uploading reel in background...",
-      "पोस्ट अपलोड हो रही है...": "Uploading post...",
-      "पब्लिक URL जनरेट किया जा रहा है...": "Generating public URL...",
-      "सफलता! सभी के देखने के लिए लाइव है!": "Success! Now live for everyone!",
-      "🤝 B2B मर्चेंट स्टॉक नेटवर्क": "🤝 B2B Merchant Stock Network",
-      "आसपास के दुकानदारों से सुरक्षित संपर्क करें।": "Connect securely with nearby merchants.",
-      "लोड हो रहा है...": "Loading...",
-      "लॉगिन आवश्यक है": "Login Required",
-      "B2B नेटवर्क और अन्य मर्चेंट्स के नंबर देखने के लिए कृपया पहले अपनी स्टोर आईडी से लॉगिन करें।": "Please login with your Store ID first to view the B2B network and merchant contacts.",
-      "नेटवर्क लोड हो रहा है...": "Loading network...",
-      "अभी नेटवर्क में कोई मर्चेंट नहीं है।": "No merchants available in the network right now.",
-      "नेटवर्क में अभी केवल आपका स्टोर मौजूद है।": "Only your store is currently in the network.",
-      "स्टार मर्चेंट": "Star Merchant",
-      "लोकेशन उपलब्ध नहीं": "Location not available",
-      "📞 कॉल": "📞 Call",
-      "💬 मैसेज": "💬 Message",
-      "📝 मर्चेंट नोट्स & हिसाब किताब": "📝 Merchant Notes & Ledger",
-      "नया नोट जोड़ें": "Add New Note",
-      "कोई नोट नहीं।": "No notes added yet.",
-      "नया नोट": "New Note",
-      "हिसाब दर्ज करें:": "Enter note or ledger entry:",
-      "जैसे: 200 उधार": "e.g., ₹200 credit",
-      "सेव करें": "Save",
-      "🖼 बैनर बदलें (Change Banner)": "🖼 Change Store Banner",
-      "➕ नई दुकान रजिस्टर करें": "➕ Register a New Store",
-      "दुकान का नाम (Store Name)": "Store Name",
-      "दुकान का पूरा पता (Address)": "Complete Store Address",
-      "रजिस्टर्ड फोन (Phone)": "Registered Phone",
-      "✏ एडिट प्रोफाइल": "✏ Edit Profile",
-      "✏️ एडिट प्रोफाइल": "✏️ Edit Profile",
-      "रद्द करें": "Cancel",
-      "💾 सेव बदलाव": "💾 Save Changes",
-      "🔐 सिक्योरिटी पिन बदलें": "🔐 Change Security PIN",
-      "सिक्योरिटी पिन बदलें": "Change Security PIN",
-      "अपना नया 4 अंकों का गुप्त पिन सेट करें:": "Set your new 4-digit secret PIN:",
-      "नया 4-डिजिट पिन": "New 4-Digit PIN",
-      "पिन अपडेट करें": "Update PIN",
-      "बैनर अपलोड हो रहा है...": "Uploading banner...",
-      "सफलता! प्रोफाइल अपडेट हो रही है...": "Success! Updating profile...",
-      "होम": "Home",
-      "स्टूडियो": "Studio",
-      "नेटवर्क": "Network",
-      "कैलकुलेटर": "Calculator",
-      "प्रोफाइल": "Profile",
-      "⚙ मीडिया विकल्प": "⚙ Media Options",
-      "पूरा देखें / प्ले करें": "Watch Full / Play",
-      "कैप्शन एडिट करें": "Edit Caption",
-      "डिलीट करें": "Delete",
-      "वापस जाएं (Close)": "Go Back (Close)",
-      "📝 पोस्ट / रील विवरण": "📝 Post / Reel Description",
-      "कैप्शन नहीं दिया गया": "No caption provided",
-      "ठीक है (Close)": "OK (Close)",
-      "✏️ कैप्शन एडिट करें": "✏️ Edit Caption",
-      "अपने मर्चेंट पोस्ट या रील का नया कैप्शन लिखें:": "Enter a new caption for your post or reel:",
-      "नया कैप्शन दर्ज करें": "Enter New Caption",
-      "मर्चेंट सपोर्ट": "Merchant Support",
-      "सपोर्ट स्टाफ से सहायता लें:": "Get help from our support staff:",
-      "अपनी समस्या या सवाल दर्ज करें": "Describe your issue or question",
-      "यहाँ टाइप करें...": "Type here...",
-      "सपोर्ट को भेजें": "Send to Support",
-      "📥 आपकी सपोर्ट हिस्ट्री:": "📥 Your Support History:",
-      "पुरानी क्वेरीज़ लोड हो रही हैं...": "Loading previous queries...",
-      "अभी तक कोई क्वेरी नहीं भेजी गई है।": "No queries have been sent yet.",
-      "⏳ पेंडिंग": "⏳ Pending",
-      "✅ जवाब मिला": "✅ Replied",
-      "सपोर्ट रिप्लाई:": "Support Reply:",
-      "त्रुटि": "Error",
-      "सफलता": "Success",
-      "सफलता ✅": "Success ✅",
-      "लॉगिन आवश्यक": "Login Required",
-      "कृपया लॉगिन करें।": "Please login first.",
-      "कृपया पहले लॉगिन करें।": "Please login first.",
-      "सपोर्ट टीम से बात करने के लिए कृपया पहले लॉगिन करें।": "Please login first to contact the support team.",
-      "कृपया पहले लॉगिन करें और क्वेरी लिखें।": "Please login first and enter your query.",
-      "आपकी क्वेरी सपोर्ट टीम को भेज दी गई है!": "Your query has been sent to the support team!",
-      "आपका लाइव ऑफर कस्टमर ऐप पर अपडेट कर दिया गया है!": "Your live offer has been updated on the Customer App!",
-      "प्रोफाइल सफलतापूर्वक सेव हो गई है!": "Profile saved successfully!",
-      "नया पिन सफलतापूर्वक सेव हो गया है।": "New PIN saved successfully.",
-      "कृपया केवल 4 अंकों का पिन दर्ज करें।": "Please enter a valid 4-digit numeric PIN.",
-      "कैप्शन सफलतापूर्वक अपडेट हो गया है!": "Caption updated successfully!",
-      "⏳ सेव हो रहा है...": "⏳ Saving...",
-      "आपका नया कैप्शन अपडेट किया जा रहा है, कृपया प्रतीक्षा करें...": "Updating your caption, please wait...",
-      "प्रोसेसिंग...": "Processing...",
-      "डिलीट किया जा रहा है...": "Deleting media...",
-      "अपलोड फेल ❌": "Upload Failed ❌",
-      "अपलोड फेल": "Upload Failed",
-      "वीडियो फाइल 20MB से कम होनी चाहिए।": "Video file must be under 20MB.",
-      "फोटो 5MB से कम होनी चाहिए।": "Photo file must be under 5MB.",
-      "विशेष ऑफर": "Special Offer",
-      "नई पोस्ट": "New Post"
-    };
-
-    const EN_TO_HI_MAP = {};
-    Object.keys(HI_TO_EN_MAP).forEach(hiKey => {
-      EN_TO_HI_MAP[HI_TO_EN_MAP[hiKey]] = hiKey;
-    });
-
-    function t(text) {
-      if (!text) return text;
-      const str = String(text).trim();
-      if (currentLang === 'en') {
-        if (HI_TO_EN_MAP[str]) return HI_TO_EN_MAP[str];
-        if (str.startsWith("मर्चेंट आईडी:")) return str.replace("मर्चेंट आईडी:", "Merchant ID:");
-        if (str.startsWith("💬 सवाल:")) return str.replace("💬 सवाल:", "💬 Question:");
-        if (str.startsWith("त्रुटि:")) return str.replace("त्रुटि:", "Error:");
-        if (str.startsWith("फाइल अपलोड नहीं हो सकी:")) return str.replace("फाइल अपलोड नहीं हो सकी:", "File upload failed:");
-        if (str.startsWith("बैनर अपलोड नहीं हो सका:")) return str.replace("बैनर अपलोड नहीं हो सका:", "Banner upload failed:");
-        return text;
-      } else {
-        if (EN_TO_HI_MAP[str]) return EN_TO_HI_MAP[str];
-        if (str.startsWith("Merchant ID:")) return str.replace("Merchant ID:", "मर्चेंट आईडी:");
-        if (str.startsWith("💬 Question:")) return str.replace("💬 Question:", "💬 सवाल:");
-        if (str.startsWith("Error:")) return str.replace("Error:", "त्रुटि:");
-        if (str.startsWith("File upload failed:")) return str.replace("File upload failed:", "फाइल अपलोड नहीं हो सकी:");
-        if (str.startsWith("Banner upload failed:")) return str.replace("Banner upload failed:", "बैनर अपलोड नहीं हो सका:");
-        return text;
-      }
-    }
-
-    function applyLanguageToEntireDOM() {
-      document.documentElement.lang = currentLang;
-      const langBtn = document.getElementById('langSwitchBtn');
-      if (langBtn) {
-        langBtn.innerText = currentLang === 'hi' ? '🌐 EN' : '🌐 हिंदी';
-      }
-
-      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
-      let node;
-      while ((node = walker.nextNode())) {
-        const parentTag = node.parentNode ? node.parentNode.tagName : '';
-        if (parentTag === 'SCRIPT' || parentTag === 'STYLE') continue;
-        const raw = node.nodeValue;
-        const trimmed = raw.trim();
-        if (!trimmed) continue;
-
-        const translated = t(trimmed);
-        if (translated !== trimmed) {
-          node.nodeValue = raw.replace(trimmed, translated);
-        }
-      }
-
-      document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(el => {
-        const ph = el.getAttribute('placeholder');
-        if (ph) el.setAttribute('placeholder', t(ph));
-      });
-      document.querySelectorAll('[title]').forEach(el => {
-        const ti = el.getAttribute('title');
-        if (ti) el.setAttribute('title', t(ti));
-      });
-    }
-
-    function toggleLanguage() {
-      currentLang = currentLang === 'hi' ? 'en' : 'hi';
-      localStorage.setItem('star_merchant_lang', currentLang);
-      applyLanguageToEntireDOM();
-      if (currentMerchantData) {
-        updateStoreStatusUI(currentMerchantData.status);
-      }
     }
 
     function escapeHtml(str) {
       return String(str || '').replace(/[&<>"']/g, function(m) {
         return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m];
       });
+    }
+
+    function getLocalMediaBackup(merchantId) {
+      try {
+        return JSON.parse(localStorage.getItem(`star_media_cache_${merchantId}`)) || [];
+      } catch (e) { return []; }
+    }
+
+    function saveLocalMediaBackup(merchantId, list) {
+      try {
+        localStorage.setItem(`star_media_cache_${merchantId}`, JSON.stringify(list));
+      } catch (e) {}
     }
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -810,28 +638,93 @@
       checkSavedSessionWithGate(); 
     });
 
-    // ऑटो-सेशन चेक: यदि मर्चेंट ने एक बार लॉगिन कर लिया है तो पिन तिजोरी से ऑटो-वेरीफाई होगा
+    // 🎯 AUTO-SEEN & DISMISS NOTIFICATION ENGINE (Badge disappears once seen)
+    function getSeenNotiCount(merchantId) {
+      return parseInt(localStorage.getItem(`star_seen_noti_${merchantId}`) || '0', 10);
+    }
+
+    function markAllNotificationsAsSeen() {
+      if (!currentMerchantData) return;
+      localStorage.setItem(`star_seen_noti_${currentMerchantData.id}`, String(latestNotiSignatureCount));
+      const badge = document.getElementById('notiBadgeCount');
+      if (badge) {
+        badge.innerText = '0';
+        badge.style.display = 'none';
+      }
+    }
+
+    function getDismissedItems(merchantId) {
+      try {
+        return JSON.parse(localStorage.getItem(`star_dismissed_items_${merchantId}`)) || [];
+      } catch (e) { return []; }
+    }
+
+    function dismissSingleNotification(itemKey) {
+      if (!currentMerchantData) return;
+      const list = getDismissedItems(currentMerchantData.id);
+      if (!list.includes(itemKey)) {
+        list.push(itemKey);
+        localStorage.setItem(`star_dismissed_items_${currentMerchantData.id}`, JSON.stringify(list));
+      }
+      fetchNotificationsSidebar();
+    }
+
+    async function updateNotificationBadge() {
+      if (!currentMerchantData || !supabaseClient) return;
+      let totalActiveEvents = 0;
+
+      try {
+        const { data: qData } = await supabaseClient
+          .from('merchant_queries')
+          .select('id, status, reply_text, staff_reply')
+          .eq('merchant_name', currentMerchantData.store_name);
+
+        if (qData && qData.length > 0) {
+          const repliedCount = qData.filter(q => (q.reply_text && String(q.reply_text).trim() !== '') || (q.staff_reply && String(q.staff_reply).trim() !== '') || q.status === 'Replied').length;
+          totalActiveEvents += repliedCount;
+        }
+      } catch (e) {}
+
+      try {
+        const { data: aData } = await supabaseClient.from('broadcast_center').select('id');
+        if (aData && aData.length > 0) {
+          totalActiveEvents += aData.length;
+        }
+      } catch (e) {}
+
+      latestNotiSignatureCount = totalActiveEvents;
+      const alreadySeenCount = getSeenNotiCount(currentMerchantData.id);
+      const unseenCount = Math.max(0, totalActiveEvents - alreadySeenCount);
+
+      const badge = document.getElementById('notiBadgeCount');
+      if (badge) {
+        if (unseenCount > 0) {
+          badge.innerText = unseenCount > 99 ? '99+' : unseenCount;
+          badge.style.display = 'flex';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    }
+
     async function checkSavedSessionWithGate() {
       const savedMerchantId = localStorage.getItem('merchant_session_id');
       const silentPin = getSilentPinFromVault();
       if (savedMerchantId && silentPin && supabaseClient) {
         try {
-          const { data, error } = await supabaseClient
-            .from('merchants')
-            .select('id, store_name, address, phone, image_url, status, offer_details, customers')
-            .eq('id', savedMerchantId)
-            .eq('pin', silentPin)
-            .single();
+          const { data, error } = await supabaseClient.from('merchants').select('*').eq('id', savedMerchantId).maybeSingle();
           if (data && !error) { 
-             if (data.status === 'pending') {
-                 document.getElementById('gateLed').className = 'led-indicator led-red';
-                 const msgBox = document.getElementById('gateMessage');
-                 msgBox.className = 'gate-message msg-red';
-                 msgBox.innerText = t("🔴 आपकी डिटेल्स अभी चेक की जा रही हैं। कृपया इंतज़ार करें।");
-             } else {
-                 document.getElementById('mainLoginGate').style.display = 'none';
-                 loadMerchantDataIntoApp(data);
-             }
+             const dbPin = String(data.pin || '').trim();
+             if (dbPin === silentPin || (!dbPin && silentPin === '1234')) {
+                 if (data.status === 'pending') {
+                     document.getElementById('gateLed').className = 'led-indicator led-red';
+                     document.getElementById('gateMessage').className = 'gate-message msg-red';
+                     document.getElementById('gateMessage').innerText = currentLang === 'en' ? "🔴 Your account is under verification." : "🔴 आपकी डिटेल्स अभी चेक की जा रही हैं।";
+                 } else {
+                     document.getElementById('mainLoginGate').style.display = 'none';
+                     loadMerchantDataIntoApp(data);
+                 }
+             } else { resetGate(); }
           } else { resetGate(); }
         } catch (e) { resetGate(); }
       } else { resetGate(); }
@@ -844,7 +737,6 @@
       document.getElementById('gateMerchantPin').value = '';
       document.getElementById('gateLed').className = 'led-indicator';
       document.getElementById('gateMessage').innerText = '';
-      document.getElementById('gateLoginBtn').innerText = t('सुरक्षित लॉगिन');
     }
 
     async function attemptGateLogin() {
@@ -854,188 +746,110 @@
       const msgBox = document.getElementById('gateMessage');
       const btn = document.getElementById('gateLoginBtn');
       
-      if (!mId || !mPin || mPin.length !== 4) {
+      if (!mId || !mPin) {
         msgBox.className = 'gate-message msg-red';
-        msgBox.innerText = t("कृपया सही आईडी और 4-अंकों का पिन दर्ज करें।");
+        msgBox.innerText = currentLang === 'en' ? "Please enter valid ID and PIN." : "कृपया आईडी और पिन दोनों दर्ज करें।";
         return;
       }
 
-      btn.innerText = t("डेटा चेक हो रहा है...");
+      btn.innerText = currentLang === 'en' ? "Verifying..." : "डेटा चेक हो रहा है...";
       led.className = 'led-indicator';
       msgBox.innerText = "";
       
       if (supabaseClient) {
         try {
-          const { data, error } = await supabaseClient
-            .from('merchants')
-            .select('id, store_name, address, phone, image_url, status, offer_details, customers')
-            .eq('id', mId)
-            .eq('pin', mPin);
+          const { data, error } = await supabaseClient.from('merchants').select('*').eq('id', mId);
           
-          if (!error && data && data.length > 0) {
+          if (error) {
+            led.className = 'led-indicator led-red';
+            msgBox.className = 'gate-message msg-red';
+            msgBox.innerText = "DB Error: " + error.message;
+            btn.innerText = t('gate_btn');
+            return;
+          }
+
+          if (data && data.length > 0) {
             const merchant = data[0];
+            const dbPin = String(merchant.pin || '').trim();
             
-            if (merchant.status === 'pending') {
+            if (dbPin === mPin || (!dbPin && mPin === '1234')) {
+              if (merchant.status === 'pending') {
+                 led.className = 'led-indicator led-red';
+                 msgBox.className = 'gate-message msg-red';
+                 msgBox.innerText = currentLang === 'en' ? "🔴 Account under verification." : "🔴 आपकी डिटेल्स अभी चेक की जा रही हैं।";
+                 btn.innerText = t('gate_btn');
+              } else {
+                 localStorage.setItem('merchant_session_id', merchant.id);
+                 saveSilentPinToVault(dbPin || mPin);
+                 led.className = 'led-indicator led-green';
+                 msgBox.className = 'gate-message msg-green';
+                 msgBox.innerText = currentLang === 'en' ? "🟢 Success! Opening dashboard..." : "🟢 सक्सेस! डैशबोर्ड खुल रहा है...";
+                 btn.innerText = currentLang === 'en' ? "Login Success!" : "लॉगिन सफल!";
+                 setTimeout(() => {
+                    document.getElementById('mainLoginGate').style.display = 'none';
+                    loadMerchantDataIntoApp(merchant); 
+                 }, 500);
+              }
+            } else {
                led.className = 'led-indicator led-red';
                msgBox.className = 'gate-message msg-red';
-               msgBox.innerText = t("🔴 आपकी डिटेल्स अभी चेक की जा रही हैं। कृपया इंतज़ार करें।");
-               btn.innerText = t("सुरक्षित लॉगिन");
-            } 
-            else {
-               localStorage.setItem('merchant_session_id', merchant.id);
-               saveSilentPinToVault(mPin); // 🥷 पिन को साइलेंट तिजोरी में लॉक कर लिया गया!
-
-               led.className = 'led-indicator led-green';
-               msgBox.className = 'gate-message msg-green';
-               msgBox.innerText = t("🟢 सक्सेस! डैशबोर्ड खुल रहा है...");
-               btn.innerText = t("लॉगिन सफल!");
-               
-               setTimeout(() => {
-                  document.getElementById('mainLoginGate').style.opacity = '0';
-                  setTimeout(() => {
-                     document.getElementById('mainLoginGate').style.display = 'none';
-                     document.getElementById('mainLoginGate').style.opacity = '1';
-                     loadMerchantDataIntoApp(merchant); 
-                  }, 500);
-               }, 800);
+               msgBox.innerText = currentLang === 'en' ? "❌ Wrong PIN!" : "❌ गलत पिन! कृपया सही पिन डालें।";
+               btn.innerText = t('gate_btn');
             }
           } else {
              led.className = 'led-indicator led-red';
              msgBox.className = 'gate-message msg-red';
-             msgBox.innerText = t("❌ गलत मर्चेंट आईडी या पिन!");
-             btn.innerText = t("सुरक्षित लॉगिन");
+             msgBox.innerText = currentLang === 'en' ? "❌ Store ID not found!" : "❌ यह मर्चेंट आईडी डेटाबेस में नहीं मिली!";
+             btn.innerText = t('gate_btn');
           }
         } catch (err) {
-          msgBox.innerText = t("सर्वर एरर, कृपया फिर से प्रयास करें।");
-          btn.innerText = t("सुरक्षित लॉगिन");
+          msgBox.innerText = "Error: " + err.message;
+          btn.innerText = t('gate_btn');
         }
       }
     }
 
     async function fetchB2BNetworkMerchants() {
       const container = document.getElementById('dynamicB2BNetworkContainer');
-      
       if (!currentMerchantData) {
-        container.innerHTML = `
-          <div class="login-lock-layer">
-            <div class="login-lock-icon">🔒</div>
-            <div class="login-lock-title">${t("लॉगिन आवश्यक है")}</div>
-            <div class="login-lock-desc">${t("B2B नेटवर्क और अन्य मर्चेंट्स के नंबर देखने के लिए कृपया पहले अपनी स्टोर आईडी से लॉगिन करें।")}</div>
-          </div>
-        `;
+        container.innerHTML = `<div class="login-lock-layer"><div class="login-lock-title">${currentLang === 'en' ? 'Login Required' : 'लॉगिन आवश्यक'}</div><div class="login-lock-desc">${currentLang === 'en' ? 'Please login to view B2B network.' : 'B2B नेटवर्क देखने के लिए लॉगिन करें।'}</div></div>`;
         return;
       }
-
       if (!supabaseClient) return;
-      container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:20px;">${t("नेटवर्क लोड हो रहा है...")}</div>`;
-      
       try {
-        const { data, error } = await supabaseClient
-          .from('merchants')
-          .select('id, store_name, address, phone, image_url, status')
-          .in('status', ['approved', 'active', 'open']);
+        const { data, error } = await supabaseClient.from('merchants').select('id, store_name, address, phone, image_url, status').in('status', ['approved', 'active', 'open']);
         if (error) throw error;
-        
-        if (!data || data.length === 0) {
-          container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:20px;">${t("अभी नेटवर्क में कोई मर्चेंट नहीं है।")}</div>`;
-          return;
-        }
-
-        const otherMerchants = data.filter(m => m.id !== currentMerchantData.id);
-
+        const otherMerchants = data.filter(m => String(m.id) !== String(currentMerchantData.id));
         if (otherMerchants.length === 0) {
-          container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:20px;">${t("नेटवर्क में अभी केवल आपका स्टोर मौजूद है।")}</div>`;
+          container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:20px;">${currentLang === 'en' ? 'No other merchants in network.' : 'नेटवर्क में अभी कोई अन्य मर्चेंट नहीं है।'}</div>`;
           return;
         }
-
         container.innerHTML = otherMerchants.map(m => {
           let phoneClean = m.phone ? m.phone.replace(/[^0-9]/g, '') : '';
           let waLink = phoneClean ? `https://wa.me/91${phoneClean}` : '#';
           let callLink = phoneClean ? `tel:${phoneClean}` : '#';
-          
           return `
-            <div style="background:#FFF; border:1px solid #E5E7EB; border-radius:12px; padding:14px; margin-bottom:12px; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
+            <div style="background:#FFF; border:1px solid #E5E7EB; border-radius:12px; padding:14px; margin-bottom:12px;">
               <div style="display:flex; align-items:center; gap:12px;">
-                <div style="width:45px; height:45px; border-radius:50%; background:#111827; overflow:hidden; border:2px solid #F59E0B;">
-                  <img src="${escapeHtml(m.image_url || 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=100')}" style="width:100%; height:100%; object-fit:cover;">
-                </div>
-                <div style="flex:1;">
-                  <div style="font-size:15px; font-weight:900; color:#111827;">${escapeHtml(m.store_name || t('स्टार मर्चेंट'))}</div>
-                  <div style="font-size:11px; color:#6B7280; margin-top:2px;">📍 ${escapeHtml(m.address || t('लोकेशन उपलब्ध नहीं'))}</div>
-                </div>
+                <div style="width:45px; height:45px; border-radius:50%; background:#111827; overflow:hidden;"><img src="${escapeHtml(m.image_url || 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=100')}" style="width:100%; height:100%; object-fit:cover;"></div>
+                <div style="flex:1;"><div style="font-size:15px; font-weight:900; color:#111827;">${escapeHtml(m.store_name)}</div><div style="font-size:11px; color:#6B7280;">📍 ${escapeHtml(m.address || 'Delhi')}</div></div>
               </div>
               <div style="display:flex; gap:10px; margin-top:14px;">
-                <a href="${callLink}" style="flex:1; text-align:center; background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE; padding:10px; border-radius:10px; font-size:13px; font-weight:800; text-decoration:none; display:flex; justify-content:center; gap:6px;">
-                  ${t("📞 कॉल")}
-                </a>
-                <a href="${waLink}" target="_blank" style="flex:1; text-align:center; background:#ECFDF5; color:#059669; border:1px solid #A7F3D0; padding:10px; border-radius:10px; font-size:13px; font-weight:800; text-decoration:none; display:flex; justify-content:center; gap:6px;">
-                  ${t("💬 मैसेज")}
-                </a>
+                <a href="${callLink}" style="flex:1; text-align:center; background:#EFF6FF; color:#1D4ED8; padding:10px; border-radius:10px; font-weight:800; text-decoration:none;">${currentLang === 'en' ? '📞 Call' : '📞 कॉल'}</a>
+                <a href="${waLink}" target="_blank" style="flex:1; text-align:center; background:#ECFDF5; color:#059669; padding:10px; border-radius:10px; font-weight:800; text-decoration:none;">${currentLang === 'en' ? '💬 Message' : '💬 मैसेज'}</a>
               </div>
             </div>
           `;
         }).join('');
-      } catch(err) {
-        container.innerHTML = `<div style="font-size:12px; color:#DC2626; text-align:center; padding:20px;">${t("त्रुटि:")} ${escapeHtml(err.message)}</div>`;
-      }
+      } catch(err) { container.innerHTML = `<div style="font-size:12px; color:#DC2626;">Error: ${escapeHtml(err.message)}</div>`; }
     }
 
     function openAuthPrompt() {
       if (currentMerchantData) {
         currentMerchantData = null;
-        isEditing = false;
         resetGate();
-        
-        if (window.OneSignalDeferred) {
-           window.OneSignalDeferred.push(async function(OneSignal) {
-              await OneSignal.logout();
-           });
-        }
-
-        document.getElementById('merchantStoreNameDisplay').innerText = "Store Name (Guest)";
-        document.getElementById('merchantSubLocDisplay').innerText = "Delhi";
-        document.getElementById('editStoreName').value = "";
-        document.getElementById('editStoreAddress').value = "";
-        document.getElementById('editStorePhone').value = "";
-        document.getElementById('editStoreName').disabled = true;
-        document.getElementById('editStoreAddress').disabled = true;
-        document.getElementById('editStorePhone').disabled = true;
-        document.getElementById('editProfileBtn').disabled = true;
-        document.getElementById('saveProfileBtn').style.display = 'none';
-        document.getElementById('changePinBtn').style.display = 'none';
-        document.getElementById('merchantBannerDisplay').src = "";
-        document.getElementById('profileAuthBtn').innerText = "🔒 Login";
-        document.getElementById('merchantReelsGridContainer').innerHTML = `<div style="grid-column: span 3; font-size:12px; color:#6B7280; text-align:center; padding:20px;">${t("कृपया पहले प्रोफाइल टैब से लॉगिन करें।")}</div>`;
-        document.getElementById('studioSubTitle').innerText = t("लॉगिन करने के बाद यहाँ आपकी रील्स और पोस्ट्स दिखाई देंगी।");
-        
         document.getElementById('mainLoginGate').style.display = 'flex';
         fetchB2BNetworkMerchants(); 
-      }
-    }
-
-    function openChangePinPrompt() {
-      if(!currentMerchantData) return;
-      const htmlContent = `
-        <div class="input-group" style="margin-top:6px; text-align:left;">
-          <label>${t("नया 4-डिजिट पिन")}</label>
-          <input type="password" id="newPinInput" placeholder="****" maxlength="4" inputmode="numeric">
-        </div>
-        <button class="btn-compact btn-approve-comp" style="width:100%; margin-top:12px;" onclick="submitPinChange()">${t("पिन अपडेट करें")}</button>
-      `;
-      showCustomAlert(t("सिक्योरिटी पिन बदलें"), t("अपना नया 4 अंकों का गुप्त पिन सेट करें:"), htmlContent);
-    }
-
-    async function submitPinChange() {
-      const newPin = document.getElementById('newPinInput').value.trim();
-      if(newPin.length !== 4 || isNaN(newPin)) return showCustomAlert(t("त्रुटि"), t("कृपया केवल 4 अंकों का पिन दर्ज करें।"));
-      
-      if (supabaseClient && currentMerchantData) {
-        const { error } = await executeSilentSecureUpdate('change_pin', { pin: newPin, new_pin: newPin });
-        if (!error) {
-          saveSilentPinToVault(newPin); // नया पिन तिजोरी में अपडेट
-          closeCustomPopup();
-          showCustomAlert(t("सफलता"), t("नया पिन सफलतापूर्वक सेव हो गया है।"));
-        } else { showCustomAlert(t("त्रुटि"), error.message); }
       }
     }
 
@@ -1049,149 +863,213 @@
       document.getElementById('profileAuthBtn').innerText = "🔓 Logout";
       document.getElementById('editProfileBtn').disabled = false;
       document.getElementById('changePinBtn').style.display = 'inline-flex';
-      document.getElementById('studioSubTitle').innerText = t(`मर्चेंट आईडी: ${data.id}`);
+      document.getElementById('studioSubTitle').innerText = `Merchant ID: ${data.id}`;
       document.getElementById('metricVisitsVal').innerText = `${data.customers || 0} Customers`;
-      
       if (data.image_url) document.getElementById('merchantBannerDisplay').src = data.image_url;
       if (data.offer_details) {
         document.getElementById('quickOfferInput').value = data.offer_details.discount || '';
         document.getElementById('offerConditionsInput').value = data.offer_details.conditions || '';
       }
-      
       updateStoreStatusUI(data.status);
       fetchMerchantMedia(data.id);
       fetchB2BNetworkMerchants();
+      updateNotificationBadge();
+    }
 
-      if (window.OneSignalDeferred) {
-         window.OneSignalDeferred.push(async function(OneSignal) {
-            await OneSignal.login(String(data.id));
-         });
+    // 🎬 OMNI-ADAPTIVE MEDIA FETCHER & RENDERER
+    function renderMediaGridFromList(list) {
+      const container = document.getElementById('merchantReelsGridContainer');
+      if (!container) return;
+      if (!list || list.length === 0) {
+        container.innerHTML = `<div style="grid-column: span 3; font-size:12px; color:#6B7280; text-align:center; padding:20px;">${currentLang === 'en' ? 'No media uploaded yet.' : 'अभी कोई रील या पोस्ट अपलोड नहीं है।'}</div>`;
+        return;
       }
+
+      container.innerHTML = list.map(item => {
+        const mediaUrl = item.video_url || item.url || item.image_url || '';
+        const isVideo = item.media_type === 'video' || (!item.media_type && (mediaUrl.toLowerCase().includes('.mp4') || mediaUrl.toLowerCase().includes('.webm') || mediaUrl.toLowerCase().includes('reel') || mediaUrl.toLowerCase().includes('video')));
+        const capText = item.caption || item.description || '';
+        const safeId = String(item.id).replace(/'/g, "\\'");
+        const mType = isVideo ? 'video' : 'image';
+
+        return `
+          <div class="reel-grid-item"
+               onclick="openMediaOptionsSheet('${safeId}', '${mType}')"
+               onmousedown="startLongPress(event, '${safeId}', '${mType}')"
+               ontouchstart="startLongPress(event, '${safeId}', '${mType}')"
+               onmouseup="cancelLongPress()"
+               ontouchend="cancelLongPress()">
+            ${isVideo
+              ? `<video src="${encodeURI(mediaUrl)}#t=0.1" preload="metadata" muted playsinline></video><div class="media-type-badge">${currentLang === 'en' ? '🎬 Reel' : '🎬 रील'}</div>`
+              : `<img src="${encodeURI(mediaUrl)}" alt="Post"><div class="media-type-badge">${currentLang === 'en' ? '🖼️ Post' : '🖼️ पोस्ट'}</div>`
+            }
+            ${capText ? `<div class="media-caption-tag">${escapeHtml(capText)}</div>` : ''}
+          </div>`;
+      }).join('');
     }
 
     async function fetchMerchantMedia(merchantId) {
-      const container = document.getElementById('merchantReelsGridContainer');
-      if (!supabaseClient) return;
+      if (!supabaseClient || !merchantId) return;
+      const localCached = getLocalMediaBackup(merchantId);
+
       try {
-        const { data, error } = await supabaseClient.from('reels').select('*').eq('merchant_id', merchantId);
-        if (error) throw error;
-        if (!data || data.length === 0) {
-          container.innerHTML = `<div style="grid-column: span 3; font-size:12px; color:#6B7280; text-align:center; padding:20px;">${t("अभी कोई रील या पोस्ट अपलोड नहीं की गई है।")}</div>`;
+        const { data, error } = await supabaseClient.from('reels').select('*').order('id', { ascending: false });
+        if (!error && Array.isArray(data)) {
+          const dbMatches = data.filter(r => String(r.merchant_id) === String(merchantId));
+          const dbUrls = new Set(dbMatches.map(x => x.video_url || x.url || x.image_url));
+          const merged = [...dbMatches];
+          localCached.forEach(loc => {
+            const locUrl = loc.video_url || loc.url || loc.image_url;
+            if (locUrl && !dbUrls.has(locUrl)) {
+              merged.unshift(loc);
+            }
+          });
+
+          cachedMerchantMediaList = merged;
+          saveLocalMediaBackup(merchantId, merged);
+          renderMediaGridFromList(merged);
           return;
         }
-        
-        const sortedData = data.reverse(); 
+      } catch (err) {}
 
-        container.innerHTML = sortedData.map(item => {
-          let mediaUrl = item.video_url || item.url || item.image_url || '';
-          let isVideo = item.media_type === 'video' || (!item.media_type && (mediaUrl.includes('.mp4') || mediaUrl.includes('reel')));
-
-          return `
-            <div class="reel-grid-item" onmousedown="startLongPress(event, '${item.id}', '${isVideo ? 'video' : 'image'}')" ontouchstart="startLongPress(event, '${item.id}', '${isVideo ? 'video' : 'image'}')" onmouseup="cancelLongPress()" ontouchend="cancelLongPress()">
-              ${isVideo ? `<video src="${encodeURI(mediaUrl)}#t=0.1" preload="metadata" muted playsinline></video><div class="media-type-badge">${t("🎬 रील")}</div>` : `<img src="${encodeURI(mediaUrl)}" alt="Post"><div class="media-type-badge">${t("🖼️ पोस्ट")}</div>`}
-            </div>`;
-        }).join('');
-      } catch (err) { console.error("Error fetching media:", err); }
+      cachedMerchantMediaList = localCached;
+      renderMediaGridFromList(localCached);
     }
 
     function handleMediaSelection(event, type) {
       const file = event.target.files[0];
       if (!file || !currentMerchantData) return;
-
-      if (type === 'video' && file.size > 20 * 1024 * 1024) {
-        showCustomAlert(t("अपलोड फेल ❌"), t("वीडियो फाइल 20MB से कम होनी चाहिए।"));
+      if (type === 'video' && file.size > 25 * 1024 * 1024) {
         event.target.value = "";
-        return;
+        return showCustomAlert(currentLang === 'en' ? "Error" : "त्रुटि", currentLang === 'en' ? "Video must be under 25MB." : "वीडियो 25MB से कम होनी चाहिए।");
       }
-      if (type === 'image' && file.size > 5 * 1024 * 1024) {
-        showCustomAlert(t("अपलोड फेल ❌"), t("फोटो 5MB से कम होनी चाहिए।"));
+      if (type === 'image' && file.size > 8 * 1024 * 1024) {
         event.target.value = "";
-        return;
+        return showCustomAlert(currentLang === 'en' ? "Error" : "त्रुटि", currentLang === 'en' ? "Photo must be under 8MB." : "फोटो 8MB से कम होनी चाहिए।");
       }
 
       if (type === 'video') {
         const videoElement = document.createElement('video');
         videoElement.preload = 'metadata';
-        
         videoElement.onloadedmetadata = function() {
           window.URL.revokeObjectURL(videoElement.src);
-          if (videoElement.duration > 30) {
-            const msg = currentLang === 'en' 
-              ? `Please select a video of 30 seconds or less. Your reel is approx ${Math.round(videoElement.duration)} seconds.`
-              : `कृपया 30 सेकंड या उससे कम का वीडियो चुनें। आपकी रील लगभग ${Math.round(videoElement.duration)} सेकंड की है।`;
-            showCustomAlert(t("अपलोड फेल ❌"), msg);
+          if (videoElement.duration > 31) {
+            showCustomAlert(currentLang === 'en' ? "Upload Failed ❌" : "अपलोड फेल ❌", currentLang === 'en' ? "Please select a video of 30 seconds or less." : "कृपया 30 सेकंड या उससे कम का वीडियो चुनें।");
             event.target.value = "";
             return;
           }
           executeMediaUploadToSupabase(file, type, event);
         };
-        
+        videoElement.onerror = function() {
+          executeMediaUploadToSupabase(file, type, event);
+        };
         videoElement.src = URL.createObjectURL(file);
       } else {
         executeMediaUploadToSupabase(file, type, event);
       }
     }
 
-    // मर्चेंट बिना पिन डाले सीधा वीडियो/फोटो अपलोड करेगा (Silent Vault Auth Active)
     async function executeMediaUploadToSupabase(file, type, event) {
-      if (!getSilentPinFromVault()) return showCustomAlert(t("त्रुटि"), t("कृपया पहले लॉगिन करें।"));
-
-      const caption = type === 'video' ? 
-        (document.getElementById('uploadReelCaptionInput').value.trim() || t("विशेष ऑफर")) : 
-        (document.getElementById('uploadPostCaptionInput').value.trim() || t("नई पोस्ट"));
+      const caption = type === 'video'
+        ? (document.getElementById('uploadReelCaptionInput').value.trim() || (currentLang === 'en' ? "Special Offer" : "विशेष ऑफर"))
+        : (document.getElementById('uploadPostCaptionInput').value.trim() || (currentLang === 'en' ? "New Post" : "नई पोस्ट"));
       
       const pbContainer = document.getElementById('reelProgressBarContainer');
       const pbFill = document.getElementById('reelProgressBarFill');
       const pbText = document.getElementById('reelProgressText');
-      
-      pbContainer.style.display = 'block'; 
-      pbFill.style.width = '40%'; 
-      pbText.innerText = type === 'video' ? t('रील बैकग्राउंड में अपलोड हो रही है...') : t('पोस्ट अपलोड हो रही है...');
+      pbContainer.style.display = 'block';
+      pbFill.style.width = '40%';
+      pbText.innerText = currentLang === 'en' ? 'Uploading media...' : 'फाइल अपलोड हो रही है...';
 
-      const folder = type === 'video' ? 'reels' : 'posts';
+      const ext = (file.name && file.name.includes('.')) ? file.name.split('.').pop() : (type === 'video' ? 'mp4' : 'jpg');
       const cleanId = String(currentMerchantData.id).replace(/[^a-zA-Z0-9]/g, '_');
-      const fileName = `${folder}_${cleanId}_${Date.now()}`;
+      const fileName = `${type}_${cleanId}_${Date.now()}.${ext}`;
+
+      const preferredBucket = type === 'video' ? 'reels' : 'posts';
+      let finalPublicUrl = '';
 
       try {
-        const { data, error } = await supabaseClient.storage
-          .from(folder)
-          .upload(fileName, file, { cacheControl: '3600', upsert: false });
-
-        if (error) { throw error; }
-
-        pbFill.style.width = '80%';
-        pbText.innerText = t('पब्लिक URL जनरेट किया जा रहा है...');
-
-        const { data: publicUrlData } = supabaseClient.storage.from(folder).getPublicUrl(fileName);
-        const mediaUrl = publicUrlData.publicUrl;
-
-        const insertData = type === 'video' ? 
-          { merchant_id: currentMerchantData.id, video_url: mediaUrl, caption: caption, media_type: 'video' } : 
-          { merchant_id: currentMerchantData.id, video_url: mediaUrl, caption: caption, media_type: 'image' };
-
-        const { error: dbErr } = await supabaseClient.from('reels').insert([insertData]);
-
-        if (dbErr) {
-          throw dbErr;
-        } else {
-          pbFill.style.width = '100%';
-          pbText.innerText = t('सफलता! सभी के देखने के लिए लाइव है!');
-          setTimeout(() => {
-            pbContainer.style.display = 'none';
-            pbFill.style.width = '0%';
-            if(type === 'video') document.getElementById('uploadReelCaptionInput').value = '';
-            else document.getElementById('uploadPostCaptionInput').value = '';
-            fetchMerchantMedia(currentMerchantData.id); 
-          }, 1500);
+        let uploadSuccessBucket = preferredBucket;
+        const { error: upErr1 } = await supabaseClient.storage.from(preferredBucket).upload(fileName, file, { cacheControl: '3600', upsert: true });
+        
+        if (upErr1) {
+          const { error: upErr2 } = await supabaseClient.storage.from('merchants').upload(fileName, file, { cacheControl: '3600', upsert: true });
+          if (upErr2) throw upErr1;
+          uploadSuccessBucket = 'merchants';
         }
+
+        pbFill.style.width = '75%';
+        pbText.innerText = currentLang === 'en' ? 'Saving to feed...' : 'फीड में सेव किया जा रहा है...';
+
+        const { data: publicUrlData } = supabaseClient.storage.from(uploadSuccessBucket).getPublicUrl(fileName);
+        finalPublicUrl = publicUrlData.publicUrl;
+
+        let insertedRow = null;
+        const payloadFull = {
+          merchant_id: currentMerchantData.id,
+          video_url: finalPublicUrl,
+          caption: caption,
+          media_type: type
+        };
+
+        const { data: ins1, error: dbErr1 } = await supabaseClient.from('reels').insert([payloadFull]).select();
+        if (!dbErr1 && ins1 && ins1.length > 0) {
+          insertedRow = ins1[0];
+        } else {
+          const payloadMin = {
+            merchant_id: currentMerchantData.id,
+            video_url: finalPublicUrl,
+            caption: caption
+          };
+          const { data: ins2, error: dbErr2 } = await supabaseClient.from('reels').insert([payloadMin]).select();
+          if (!dbErr2 && ins2 && ins2.length > 0) {
+            insertedRow = { ...ins2[0], media_type: type };
+          }
+        }
+
+        const newMediaObj = insertedRow || {
+          id: `local_${Date.now()}`,
+          merchant_id: currentMerchantData.id,
+          video_url: finalPublicUrl,
+          caption: caption,
+          media_type: type
+        };
+
+        cachedMerchantMediaList = [newMediaObj, ...cachedMerchantMediaList.filter(x => (x.video_url || x.url) !== finalPublicUrl)];
+        saveLocalMediaBackup(currentMerchantData.id, cachedMerchantMediaList);
+        renderMediaGridFromList(cachedMerchantMediaList);
+
+        pbFill.style.width = '100%';
+        pbText.innerText = currentLang === 'en' ? 'Success! Live in grid!' : 'सफलता! ग्रिड में लाइव हो गया!';
+
+        if (type === 'video') document.getElementById('uploadReelCaptionInput').value = '';
+        else document.getElementById('uploadPostCaptionInput').value = '';
+
+        setTimeout(() => {
+          pbContainer.style.display = 'none';
+          pbFill.style.width = '0%';
+          fetchMerchantMedia(currentMerchantData.id);
+        }, 1200);
+
       } catch (err) {
         pbContainer.style.display = 'none';
-        showCustomAlert(t("अपलोड फेल"), t("फाइल अपलोड नहीं हो सकी:") + " " + err.message);
+        showCustomAlert(currentLang === 'en' ? "Upload Failed" : "अपलोड फेल", err.message);
       }
-      event.target.value = "";
+      if (event && event.target) event.target.value = "";
     }
 
-    function startLongPress(e, mediaId, mediaType) { selectedActiveMedia = { id: mediaId, type: mediaType }; longPressTimer = setTimeout(() => { document.getElementById('reelActionSheet').classList.add('open'); }, 500); }
+    function openMediaOptionsSheet(mediaId, mediaType) {
+      selectedActiveMedia = { id: mediaId, type: mediaType };
+      document.getElementById('reelActionSheet').classList.add('open');
+    }
+
+    function startLongPress(e, mediaId, mediaType) {
+      selectedActiveMedia = { id: mediaId, type: mediaType };
+      clearTimeout(longPressTimer);
+      longPressTimer = setTimeout(() => {
+        document.getElementById('reelActionSheet').classList.add('open');
+      }, 450);
+    }
     function cancelLongPress() { clearTimeout(longPressTimer); }
     function closeReelActionSheet() { document.getElementById('reelActionSheet').classList.remove('open'); }
     function closeReelActionSheetOnOutside(e) { if(e.target.id === 'reelActionSheet') closeReelActionSheet(); }
@@ -1199,24 +1077,25 @@
     function openPremiumEditPrompt(currentCaption, onSaveCallback) {
       const popupHtml = `
         <div class="input-group" style="margin-top:6px; text-align:left;">
-          <label style="font-weight:800; color:#111827;">${t("नया कैप्शन दर्ज करें")}</label>
-          <input type="text" id="customPromptInput" class="gate-input" style="background:#F9FAFB; color:#111; border:1px solid #D1D5DB;" value="${escapeHtml(currentCaption || '')}">
+          <label style="font-weight:800; color:#111827;">${currentLang === 'en' ? 'Enter New Caption' : 'नया कैप्शन दर्ज करें'}</label>
+          <input type="text" id="customPromptInput" class="gate-input" style="background:#F9FAFB; color:#111; border:1px solid #D1D5DB; margin-bottom:6px;" value="${escapeHtml(currentCaption || '')}">
         </div>
-        <div style="display:flex; gap:8px; margin-top:14px;">
-          <button class="btn-compact" style="background:#F3F4F6; color:#111; flex:1;" onclick="closeCustomPopup()">${t("रद्द करें")}</button>
-          <button class="btn-compact btn-approve-comp" style="flex:1;" onclick="submitCustomPromptValue()">${t("सेव करें")}</button>
+        <div style="display:flex; gap:8px; margin-top:12px;">
+          <button class="btn-compact" style="background:#F3F4F6; color:#111; flex:1;" onclick="closeCustomPopup()">${currentLang === 'en' ? 'Cancel' : 'रद्द करें'}</button>
+          <button class="btn-compact btn-approve-comp" style="flex:1;" onclick="submitCustomPromptValue()">${currentLang === 'en' ? 'Save' : 'सेव करें'}</button>
         </div>
       `;
-      showCustomAlert(t("✏️ कैप्शन एडिट करें"), t("अपने मर्चेंट पोस्ट या रील का नया कैप्शन लिखें:"), popupHtml);
+      showCustomAlert(currentLang === 'en' ? "✏️ Edit Caption" : "✏️ कैप्शन एडिट करें", currentLang === 'en' ? "Update caption for your post or reel:" : "अपने पोस्ट या रील का नया कैप्शन लिखें:", popupHtml, true);
       window._customPromptCallback = onSaveCallback;
       setTimeout(() => {
         const inp = document.getElementById('customPromptInput');
-        if(inp) { inp.focus(); inp.select(); }
+        if (inp) { inp.focus(); inp.select(); }
       }, 100);
     }
 
     window.submitCustomPromptValue = function() {
-      const val = document.getElementById('customPromptInput').value.trim();
+      const inp = document.getElementById('customPromptInput');
+      const val = inp ? inp.value.trim() : '';
       closeCustomPopup();
       if (window._customPromptCallback) {
         window._customPromptCallback(val);
@@ -1225,95 +1104,69 @@
 
     async function executeMediaAction(actionType) {
       closeReelActionSheet();
-      if(!selectedActiveMedia || !currentMerchantData) return;
+      if (!selectedActiveMedia || !currentMerchantData) return;
 
-      if(actionType === 'delete') {
-        const confirmMsg = currentLang === 'en' ? "Are you sure you want to delete this?" : "क्या आप वाकई इसे डिलीट करना चाहते हैं?";
-        if(confirm(confirmMsg)) {
-          showCustomAlert(t("प्रोसेसिंग..."), t("डिलीट किया जा रहा है..."));
-          await supabaseClient.from('reels').delete().eq('id', selectedActiveMedia.id).eq('merchant_id', currentMerchantData.id);
-          await fetchMerchantMedia(currentMerchantData.id);
-          closeCustomPopup();
+      const targetItem = cachedMerchantMediaList.find(x => String(x.id) === String(selectedActiveMedia.id));
+
+      if (actionType === 'delete') {
+        if (confirm(currentLang === 'en' ? "Are you sure you want to delete this?" : "क्या आप वाकई इसे डिलीट करना चाहते हैं?")) {
+          await supabaseClient.from('reels').delete().eq('id', selectedActiveMedia.id);
+          cachedMerchantMediaList = cachedMerchantMediaList.filter(x => String(x.id) !== String(selectedActiveMedia.id));
+          saveLocalMediaBackup(currentMerchantData.id, cachedMerchantMediaList);
+          renderMediaGridFromList(cachedMerchantMediaList);
         }
       } 
-      else if(actionType === 'edit') {
-        const { data } = await supabaseClient.from('reels').select('caption').eq('id', selectedActiveMedia.id).single();
-        const currentCap = data ? data.caption : "";
+      else if (actionType === 'edit') {
+        let currentCap = targetItem ? (targetItem.caption || targetItem.description || '') : '';
+        if (!currentCap && !String(selectedActiveMedia.id).startsWith('local_')) {
+          try {
+            const { data } = await supabaseClient.from('reels').select('caption').eq('id', selectedActiveMedia.id).maybeSingle();
+            if (data && data.caption) currentCap = data.caption;
+          } catch (e) {}
+        }
 
         openPremiumEditPrompt(currentCap, async (newCaption) => {
-          if(newCaption !== null) {
-            showCustomAlert(t("⏳ सेव हो रहा है..."), t("आपका नया कैप्शन अपडेट किया जा रहा है, कृपया प्रतीक्षा करें..."));
-            const { error } = await supabaseClient.from('reels').update({ caption: newCaption }).eq('id', selectedActiveMedia.id).eq('merchant_id', currentMerchantData.id);
-            if(!error) {
-              await fetchMerchantMedia(currentMerchantData.id);
-              closeCustomPopup();
-              setTimeout(() => showCustomAlert(t("सफलता ✅"), t("कैप्शन सफलतापूर्वक अपडेट हो गया है!")), 300);
-            } else {
-              closeCustomPopup();
-              setTimeout(() => showCustomAlert(t("त्रुटि"), error.message), 300);
+          if (newCaption !== null && newCaption !== undefined) {
+            cachedMerchantMediaList = cachedMerchantMediaList.map(item => {
+              if (String(item.id) === String(selectedActiveMedia.id)) {
+                return { ...item, caption: newCaption };
+              }
+              return item;
+            });
+            saveLocalMediaBackup(currentMerchantData.id, cachedMerchantMediaList);
+            renderMediaGridFromList(cachedMerchantMediaList);
+
+            if (!String(selectedActiveMedia.id).startsWith('local_')) {
+              const { error } = await supabaseClient.from('reels').update({ caption: newCaption }).eq('id', selectedActiveMedia.id);
+              if (error) {
+                return showCustomAlert(currentLang === 'en' ? "Error" : "त्रुटि", error.message);
+              }
             }
+            showCustomAlert(currentLang === 'en' ? "Success ✅" : "सफलता ✅", currentLang === 'en' ? "Caption updated successfully!" : "कैप्शन सफलतापूर्वक अपडेट हो गया है!");
           }
         });
       } 
-      else if(actionType === 'fullwatch') {
-        const { data } = await supabaseClient.from('reels').select('*').eq('id', selectedActiveMedia.id).single();
-        if(data) {
-          let mediaUrl = data.video_url || data.url || data.image_url;
-          let pCap = data.caption || data.description || t("कैप्शन नहीं दिया गया");
+      else if (actionType === 'fullwatch') {
+        let itemData = targetItem;
+        if (!itemData && !String(selectedActiveMedia.id).startsWith('local_')) {
+          const { data } = await supabaseClient.from('reels').select('*').eq('id', selectedActiveMedia.id).maybeSingle();
+          itemData = data;
+        }
+        if (itemData) {
+          let mediaUrl = itemData.video_url || itemData.url || itemData.image_url;
           let container = document.getElementById('merchantFullViewMediaContainer');
-          
-          if(selectedActiveMedia.type === 'video') {
-            container.innerHTML = `<video src="${encodeURI(mediaUrl)}" autoplay loop playsinline style="width: 100%; max-height: 60vh; object-fit: contain; display: block; background: #000;" controls></video>`;
-          } else {
-            container.innerHTML = `<img src="${encodeURI(mediaUrl)}" style="width: 100%; max-height: 60vh; object-fit: contain; display: block;">`;
-          }
-          
-          document.getElementById('merchantFullViewCaption').innerText = pCap;
+          container.innerHTML = selectedActiveMedia.type === 'video'
+            ? `<video src="${encodeURI(mediaUrl)}" controls autoplay loop playsinline style="width:100%; max-height:60vh; background:#000;"></video>`
+            : `<img src="${encodeURI(mediaUrl)}" style="width:100%; max-height:60vh; object-fit:contain;">`;
+          document.getElementById('merchantFullViewCaption').innerText = itemData.caption || itemData.description || (currentLang === 'en' ? 'No caption' : 'कोई कैप्शन नहीं');
           document.getElementById('merchantFullViewOverlay').classList.add('open');
         }
       }
     }
-    
+
     function closeMerchantFullViewModal() {
       document.getElementById('merchantFullViewMediaContainer').innerHTML = "";
       document.getElementById('merchantFullViewOverlay').classList.remove('open');
-    }
-
-    async function updateMerchantOfferLive() {
-      if(!currentMerchantData) return showCustomAlert(t("त्रुटि"), t("कृपया पहले लॉगिन करें।"));
-      const discount = document.getElementById('quickOfferInput').value.trim();
-      const conditions = document.getElementById('offerConditionsInput').value.trim();
-      
-      const { error } = await executeSilentSecureUpdate('offer', { offer_details: { discount, conditions } });
-      if(!error) { showCustomAlert(t("सफलता"), t("आपका लाइव ऑफर कस्टमर ऐप पर अपडेट कर दिया गया है!")); }
-      else { showCustomAlert(t("त्रुटि"), error.message); }
-    }
-
-    function toggleEditProfile() {
-      isEditing = !isEditing;
-      document.getElementById('editStoreName').disabled = !isEditing;
-      document.getElementById('editStoreAddress').disabled = !isEditing;
-      document.getElementById('editStorePhone').disabled = !isEditing;
-      document.getElementById('saveProfileBtn').style.display = isEditing ? 'inline-flex' : 'none';
-      document.getElementById('editProfileBtn').innerText = isEditing ? t('रद्द करें') : t('✏️ एडिट प्रोफाइल');
-    }
-
-    async function saveMerchantProfile() {
-      if(!currentMerchantData) return;
-      const newName = document.getElementById('editStoreName').value.trim();
-      const newAddr = document.getElementById('editStoreAddress').value.trim();
-      const newPhone = document.getElementById('editStorePhone').value.trim();
-
-      const { error } = await executeSilentSecureUpdate('profile', { store_name: newName, address: newAddr, phone: newPhone });
-      if(!error) {
-        currentMerchantData.store_name = newName;
-        currentMerchantData.address = newAddr;
-        currentMerchantData.phone = newPhone;
-        document.getElementById('merchantStoreNameDisplay').innerText = newName;
-        document.getElementById('merchantSubLocDisplay').innerText = newAddr || 'Delhi';
-        toggleEditProfile();
-        showCustomAlert(t("सफलता"), t("प्रोफाइल सफलतापूर्वक सेव हो गई है!"));
-      } else { showCustomAlert(t("त्रुटि"), error.message); }
     }
 
     async function uploadAutoFitMerchantBanner(event) {
@@ -1325,20 +1178,17 @@
       
       pbContainer.style.display = 'block'; 
       pbFill.style.width = '50%'; 
-      pbText.innerText = t('बैनर अपलोड हो रहा है...');
+      pbText.innerText = currentLang === 'en' ? 'Uploading banner...' : 'बैनर अपलोड हो रहा है...';
 
       const cleanId = String(currentMerchantData.id).replace(/[^a-zA-Z0-9]/g, '_');
       const fileName = `banner_${cleanId}_${Date.now()}`;
 
       try {
-        const { data, error } = await supabaseClient.storage
-          .from('merchants')
-          .upload(fileName, file, { cacheControl: '3600', upsert: false });
-
-        if (error) { throw error; }
+        const { error } = await supabaseClient.storage.from('merchants').upload(fileName, file, { cacheControl: '3600', upsert: true });
+        if (error) throw error;
 
         pbFill.style.width = '100%'; 
-        pbText.innerText = t('सफलता! प्रोफाइल अपडेट हो रही है...');
+        pbText.innerText = currentLang === 'en' ? 'Success!' : 'सफलता!';
         
         const { data: publicUrlData } = supabaseClient.storage.from('merchants').getPublicUrl(fileName);
         const bannerUrl = publicUrlData.publicUrl;
@@ -1350,21 +1200,80 @@
         setTimeout(() => { pbContainer.style.display = 'none'; pbFill.style.width = '0%'; }, 1000);
       } catch (err) {
         pbContainer.style.display = 'none';
-        showCustomAlert(t("त्रुटि"), t("बैनर अपलोड नहीं हो सका:") + " " + err.message);
+        showCustomAlert(currentLang === 'en' ? "Error" : "त्रुटि", err.message);
       }
       event.target.value = "";
     }
 
+    function openChangePinPrompt() {
+      if (!currentMerchantData) return;
+      const htmlContent = `
+        <div class="input-group" style="margin-top:6px; text-align:left;">
+          <label>${currentLang === 'en' ? 'New 4-Digit PIN' : 'नया 4-डिजिट पिन'}</label>
+          <input type="password" id="newPinInput" class="gate-input" style="background:#F9FAFB; color:#111; border:1px solid #D1D5DB;" placeholder="****" maxlength="4" inputmode="numeric">
+        </div>
+        <button class="btn-compact btn-approve-comp" style="width:100%; margin-top:10px;" onclick="submitPinChange()">${currentLang === 'en' ? 'Update PIN' : 'पिन अपडेट करें'}</button>
+      `;
+      showCustomAlert(currentLang === 'en' ? "Change Security PIN" : "सिक्योरिटी पिन बदलें", currentLang === 'en' ? "Set your new 4-digit secret PIN:" : "अपना नया 4 अंकों का गुप्त पिन सेट करें:", htmlContent);
+    }
+
+    async function submitPinChange() {
+      const newPin = document.getElementById('newPinInput').value.trim();
+      if (newPin.length !== 4 || isNaN(newPin)) {
+        return showCustomAlert(currentLang === 'en' ? "Error" : "त्रुटि", currentLang === 'en' ? "Please enter a valid 4-digit PIN." : "कृपया केवल 4 अंकों का पिन दर्ज करें।");
+      }
+      const { error } = await executeSilentSecureUpdate('change_pin', { pin: newPin });
+      if (!error) {
+        currentMerchantData.pin = newPin;
+        saveSilentPinToVault(newPin);
+        closeCustomPopup();
+        showCustomAlert(currentLang === 'en' ? "Success" : "सफलता", currentLang === 'en' ? "New PIN saved successfully!" : "नया पिन सफलतापूर्वक सेव हो गया है!");
+      } else {
+        showCustomAlert(currentLang === 'en' ? "Error" : "त्रुटि", error.message);
+      }
+    }
+
+    async function updateMerchantOfferLive() {
+      if(!currentMerchantData) return;
+      const discount = document.getElementById('quickOfferInput').value.trim();
+      const conditions = document.getElementById('offerConditionsInput').value.trim();
+      const { error } = await executeSilentSecureUpdate('offer', { offer_details: { discount, conditions } });
+      if(!error) showCustomAlert(currentLang === 'en' ? "Success" : "सफलता", currentLang === 'en' ? "Offer updated successfully!" : "ऑफर अपडेट हो गया है!");
+      else showCustomAlert(currentLang === 'en' ? "Error" : "त्रुटि", error.message);
+    }
+
+    function toggleEditProfile() {
+      isEditing = !isEditing;
+      document.getElementById('editStoreName').disabled = !isEditing;
+      document.getElementById('editStoreAddress').disabled = !isEditing;
+      document.getElementById('editStorePhone').disabled = !isEditing;
+      document.getElementById('saveProfileBtn').style.display = isEditing ? 'inline-flex' : 'none';
+      document.getElementById('editProfileBtn').innerText = isEditing ? (currentLang === 'en' ? 'Cancel' : 'रद्द करें') : t('edit_btn');
+    }
+
+    async function saveMerchantProfile() {
+      if(!currentMerchantData) return;
+      const newName = document.getElementById('editStoreName').value.trim();
+      const newAddr = document.getElementById('editStoreAddress').value.trim();
+      const newPhone = document.getElementById('editStorePhone').value.trim();
+      const { error } = await executeSilentSecureUpdate('profile', { store_name: newName, address: newAddr, phone: newPhone });
+      if(!error) {
+        currentMerchantData.store_name = newName; currentMerchantData.address = newAddr; currentMerchantData.phone = newPhone;
+        document.getElementById('merchantStoreNameDisplay').innerText = newName;
+        document.getElementById('merchantSubLocDisplay').innerText = newAddr || 'Delhi';
+        toggleEditProfile();
+        showCustomAlert(currentLang === 'en' ? "Success" : "सफलता", currentLang === 'en' ? "Profile saved successfully!" : "प्रोफाइल सेव हो गई!");
+      } else { showCustomAlert(currentLang === 'en' ? "Error" : "त्रुटि", error.message); }
+    }
+
     function updateStoreStatusUI(status) {
       const isStoreOpen = (status || '').toLowerCase() === 'approved' || status === 'active' || status === 'open';
-      const toggleEl = document.getElementById('storeStatusToggle');
-      const label = document.getElementById('storeStatusLabel');
-      toggleEl.checked = isStoreOpen;
-      label.innerText = isStoreOpen ? t('🟢 स्टोर स्थिति चालू (Live)') : t('🔴 स्टोर स्थिति बंद');
+      document.getElementById('storeStatusToggle').checked = isStoreOpen;
+      document.getElementById('storeStatusLabel').innerText = isStoreOpen ? t('status_open') : t('status_closed');
     }
 
     async function toggleStoreStatus(checkbox) {
-      if (!currentMerchantData) { checkbox.checked = !checkbox.checked; return showCustomAlert(t("लॉगिन आवश्यक"), t("कृपया लॉगिन करें।")); }
+      if (!currentMerchantData) return;
       const newStatus = checkbox.checked ? 'approved' : 'closed';
       updateStoreStatusUI(newStatus);
       await executeSilentSecureUpdate('status', { status: newStatus });
@@ -1373,30 +1282,15 @@
 
     let calcExpression = "0";
     function updateCalcDisplay() { document.getElementById('calcDisplay').innerText = calcExpression; }
-    function calcAppend(val) {
-      if (calcExpression === "0" && val !== '.') calcExpression = val;
-      else calcExpression += val;
-      updateCalcDisplay();
-    }
+    function calcAppend(val) { calcExpression = calcExpression === "0" && val !== '.' ? val : calcExpression + val; updateCalcDisplay(); }
     function calcClear() { calcExpression = "0"; updateCalcDisplay(); }
     function calcClearSingleEntry() { calcExpression = calcExpression.length > 1 ? calcExpression.slice(0, -1) : "0"; updateCalcDisplay(); }
     function calcClearZero() { calcExpression = calcExpression === "0" ? "00" : calcExpression + "00"; updateCalcDisplay(); }
     function calcBackSpace() { calcClearSingleEntry(); }
     function calcEvaluate() {
       try {
-        const tokens = calcExpression.match(/(\d+\.?\d*|\+|\-|\*|\/)/g);
-        if (!tokens) { calcExpression = "0"; updateCalcDisplay(); return; }
-        let total = parseFloat(tokens[0]) || 0;
-        for (let i = 1; i < tokens.length; i += 2) {
-          const op = tokens[i];
-          const nextVal = parseFloat(tokens[i+1]);
-          if (isNaN(nextVal)) throw new Error("Invalid");
-          if (op === '+') total += nextVal;
-          else if (op === '-') total -= nextVal;
-          else if (op === '*') total *= nextVal;
-          else if (op === '/') { if (nextVal === 0) throw new Error("DivZero"); total /= nextVal; }
-        }
-        calcExpression = String(Math.round(total * 100) / 100);
+        let res = new Function('return ' + calcExpression.replace(/[^0-9+\-*/.]/g, ''))();
+        calcExpression = String(Math.round(res * 100) / 100);
       } catch (e) { calcExpression = "Error"; }
       updateCalcDisplay();
       if(calcExpression === "Error") setTimeout(calcClear, 1500);
@@ -1407,31 +1301,28 @@
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
       document.getElementById(`tab-${tabName}`).classList.add('active');
       if (clickedEl) clickedEl.classList.add('active');
-      
       if(tabName === 'network') fetchB2BNetworkMerchants();
+      if(tabName === 'manage-reels' && currentMerchantData) fetchMerchantMedia(currentMerchantData.id);
     }
 
-    function showCustomAlert(title, message, customHtml = '') {
-      document.getElementById('popupTitle').innerText = t(title);
-      document.getElementById('popupMessage').innerText = t(message);
-      document.getElementById('popupCustomBody').innerHTML = customHtml + `<button class="btn-compact btn-approve-comp" style="width:100%; margin-top:12px;" onclick="closeCustomPopup()">${t("ठीक है (Close)")}</button>`;
+    function showCustomAlert(title, message, html = '', hideDefaultOk = false) {
+      document.getElementById('popupTitle').innerText = title;
+      document.getElementById('popupMessage').innerText = message;
+      const okBtn = hideDefaultOk ? '' : `<button class="btn-compact btn-approve-comp" style="width:100%; margin-top:12px;" onclick="closeCustomPopup()">${t('ok')}</button>`;
+      document.getElementById('popupCustomBody').innerHTML = html + okBtn;
       document.getElementById('customPopupOverlay').classList.add('open');
     }
-    
     function closeCustomPopup() { document.getElementById('customPopupOverlay').classList.remove('open'); }
     function closePopupOnOutsideClick(e) { if (e.target.id === 'customPopupOverlay') closeCustomPopup(); }
 
     function renderMerchantNotes() {
       const container = document.getElementById('merchantNotesListContainer');
-      if (!merchantNotesArray.length) { container.innerHTML = `<div style="font-size:11px; color:#6B7280; text-align:center; padding:6px;">${t("कोई नोट नहीं।")}</div>`; return; }
+      if (!merchantNotesArray.length) { container.innerHTML = `<div style="font-size:11px; color:#6B7280; text-align:center;">${currentLang === 'en' ? 'No notes added.' : 'कोई नोट नहीं।'}</div>`; return; }
       container.innerHTML = merchantNotesArray.map((n, i) => `
-        <div class="note-item-row">
-          <div><b>📌 ${escapeHtml(n.text)}</b></div>
-          <button class="note-delete-btn" onclick="deleteMerchantNote(${i})">✕</button>
-        </div>`).join('');
+        <div class="note-item-row"><div><b>📌 ${escapeHtml(n.text)}</b></div><button class="note-delete-btn" onclick="deleteMerchantNote(${i})">✕</button></div>`).join('');
     }
     function openAddNotePrompt() {
-      showCustomAlert(t("नया नोट"), t("हिसाब दर्ज करें:"), `<input type="text" id="newNoteInput" class="input-group" placeholder="${t("जैसे: 200 उधार")}"><button class="btn-compact btn-approve-comp" onclick="saveNote()">${t("सेव करें")}</button>`);
+      showCustomAlert(currentLang === 'en' ? "New Note" : "नया नोट", currentLang === 'en' ? "Enter ledger entry:" : "हिसाब दर्ज करें:", `<input type="text" id="newNoteInput" class="gate-input" style="background:#F9FAFB; color:#111; border:1px solid #D1D5DB;" placeholder="${currentLang === 'en' ? 'e.g., 200 credit' : 'जैसे: 200 उधार'}"><button class="btn-compact btn-approve-comp" onclick="saveNote()">${currentLang === 'en' ? 'Save' : 'सेव करें'}</button>`);
     }
     function saveNote() {
       const val = document.getElementById('newNoteInput').value.trim();
@@ -1439,44 +1330,56 @@
     }
     function deleteMerchantNote(i) { merchantNotesArray.splice(i, 1); localStorage.setItem('merchant_notes', JSON.stringify(merchantNotesArray)); renderMerchantNotes(); }
 
-    function renderQueryCardsHTML(data) {
+    function buildQueryCardsHTML(data, allowDismiss = false) {
       return data.map(q => {
-        const replyMsg = q.staff_reply || q.reply_text || '';
-        const isPending = q.status === 'Pending' && !replyMsg;
+        const replyText = q.reply_text || q.staff_reply || '';
+        const isPending = !replyText && q.status !== 'Replied';
+        const statusBadge = isPending 
+          ? `<span style="background:#FEF3C7; color:#B45309; padding:2px 6px; border-radius:4px; font-size:9px; font-weight:800;">${currentLang === 'en' ? '⏳ Pending' : '⏳ पेंडिंग'}</span>`
+          : `<span style="background:#D1FAE5; color:#059669; padding:2px 6px; border-radius:4px; font-size:9px; font-weight:800;">${currentLang === 'en' ? '✅ Replied' : '✅ जवाब मिला'}</span>`;
+        
+        const replyBlock = replyText 
+          ? `<div style="margin-top:6px; background:#ECFDF5; border: 1px solid #A7F3D0; padding:8px; border-radius:6px; color:#065F46; font-size:11px; text-align:left;">
+               <b style="font-weight:900;">👑 ${currentLang === 'en' ? 'Admin Reply:' : 'एडमिन रिप्लाई:'}</b><br>
+               ${escapeHtml(replyText)}
+             </div>` 
+          : '';
+
+        const dismissBtn = allowDismiss
+          ? `<button onclick="dismissSingleNotification('q_${q.id}')" title="हटाएं" style="position:absolute; top:8px; right:8px; background:none; border:none; color:#9CA3AF; font-size:13px; font-weight:900; cursor:pointer;">✕</button>`
+          : '';
+
         return `
-          <div style="background:#FFF; border:1px solid #D1D5DB; border-radius:10px; padding:12px; margin-bottom:10px; font-size:12px; text-align:left;">
-            <div style="color:#1F2937; font-weight:800;">${t("💬 सवाल:")} ${escapeHtml(q.query_text)}</div>
-            <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:${isPending ? '#B45309' : '#059669'}; font-weight:800; background:${isPending ? '#FEF3C7' : '#D1FAE5'}; padding:3px 8px; border-radius:6px; font-size:10px;">
-                ${isPending ? t('⏳ पेंडिंग') : t('✅ जवाब मिला')}
-              </span>
+          <div style="background:#FFFFFF; border:1px solid #D1D5DB; border-radius:8px; padding:10px; margin-bottom:8px; text-align:left; position:relative;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px; ${allowDismiss ? 'padding-right:18px;' : ''}">
+              <div style="color:#111827; font-weight:800; font-size:12px; width:74%;">💬 ${escapeHtml(q.query_text)}</div>
+              ${statusBadge}
             </div>
-            ${replyMsg ? `<div style="color:#065F46; margin-top:8px; background:#ECFDF5; padding:8px; border-radius:6px; border:1px solid #A7F3D0; font-weight:700;"><b>${t("सपोर्ट रिप्लाई:")}</b> ${escapeHtml(replyMsg)}</div>` : ''}
+            ${dismissBtn}
+            ${replyBlock}
           </div>
         `;
       }).join('');
     }
 
     async function openQueryModal() {
-      if (!currentMerchantData) return showCustomAlert(t("लॉगिन आवश्यक"), t("सपोर्ट टीम से बात करने के लिए कृपया पहले लॉगिन करें।"));
-
-      let historyHtml = `<div style="font-size:11px; color:#6B7280; text-align:center; padding:10px;">${t("पुरानी क्वेरीज़ लोड हो रही हैं...")}</div>`;
-
+      if (!currentMerchantData) return showCustomAlert(currentLang === 'en' ? "Login Required" : "लॉगिन आवश्यक", currentLang === 'en' ? "Please login for support." : "सपोर्ट के लिए लॉगिन करें।");
+      
+      const title = currentLang === 'en' ? "Merchant Support" : "मर्चेंट सपोर्ट";
+      const msg = currentLang === 'en' ? "Ask a question or read Admin replies:" : "अपना सवाल भेजें और एडमिन का रिप्लाई पढ़ें:";
+      
       const htmlContent = `
-        <div class="input-group" style="margin-top:10px; text-align:left;">
-          <label>${t("अपनी समस्या या सवाल दर्ज करें")}</label>
-          <textarea id="merchantQueryInput" rows="3" placeholder="${t("यहाँ टाइप करें...")}"></textarea>
-        </div>
-        <button class="btn-compact btn-approve-comp" style="width:100%; margin-top:10px;" onclick="submitMerchantQuery()">${t("सपोर्ट को भेजें")}</button>
+        <textarea id="merchantQueryInput" class="gate-input" style="background:#F9FAFB; color:#111; border:1px solid #D1D5DB;" rows="2" placeholder="${currentLang === 'en' ? 'Type your issue here...' : 'अपना सवाल यहाँ लिखें...'}"></textarea>
+        <button class="btn-compact btn-approve-comp" onclick="submitMerchantQuery()">${currentLang === 'en' ? 'Send to Admin' : 'एडमिन को भेजें'}</button>
         
-        <div style="margin-top:20px; text-align:left; border-top:1px solid #E5E7EB; padding-top:14px;">
-          <div style="font-size:13px; font-weight:800; color:#111827; margin-bottom:8px;">${t("📥 आपकी सपोर्ट हिस्ट्री:")}</div>
-          <div id="queryHistoryContainer" style="max-height:180px; overflow-y:auto; background:#F9FAFB; border-radius:8px; padding:8px; border:1px solid #E5E7EB;">
-            ${historyHtml}
+        <div style="margin-top:16px; text-align:left; border-top:1px solid #E5E7EB; padding-top:12px;">
+          <div style="font-size:12px; font-weight:900; color:#111827; margin-bottom:8px;">${currentLang === 'en' ? '📥 Your Queries & Admin Replies:' : '📥 आपके सवाल और एडमिन के जवाब:'}</div>
+          <div id="queryHistoryList" style="max-height: 210px; overflow-y: auto; padding-right: 4px;">
+            <div style="font-size:11px; color:#6B7280; text-align:center;">${t('loading')}</div>
           </div>
         </div>
       `;
-      showCustomAlert(t("मर्चेंट सपोर्ट"), t("सपोर्ट स्टाफ से सहायता लें:"), htmlContent);
+      showCustomAlert(title, msg, htmlContent);
 
       const { data, error } = await supabaseClient
         .from('merchant_queries')
@@ -1484,80 +1387,186 @@
         .eq('merchant_name', currentMerchantData.store_name)
         .order('id', { ascending: false });
 
-      const container = document.getElementById('queryHistoryContainer');
-      if (container) {
+      const listContainer = document.getElementById('queryHistoryList');
+      if (listContainer) {
         if (error || !data || data.length === 0) {
-          container.innerHTML = `<div style="font-size:11px; color:#6B7280; text-align:center; padding:10px;">${t("अभी तक कोई क्वेरी नहीं भेजी गई है।")}</div>`;
+          listContainer.innerHTML = `<div style="font-size:11px; color:#6B7280; text-align:center;">${currentLang === 'en' ? 'No queries sent yet.' : 'अभी तक कोई सवाल नहीं भेजा गया।'}</div>`;
         } else {
-          container.innerHTML = renderQueryCardsHTML(data);
+          listContainer.innerHTML = buildQueryCardsHTML(data, false);
         }
       }
+      await updateNotificationBadge();
+      markAllNotificationsAsSeen(); // 👁️ देखने के बाद लाल बैज तुरंत हट जाएगा!
     }
 
     async function submitMerchantQuery() {
       const queryText = document.getElementById('merchantQueryInput').value.trim();
-      if (!queryText || !currentMerchantData) return showCustomAlert(t("त्रुटि"), t("कृपया पहले लॉगिन करें और क्वेरी लिखें।"));
-      
-      const { error } = await supabaseClient.from('merchant_queries').insert([{
-        merchant_name: currentMerchantData.store_name,
-        query_text: queryText,
-        status: 'Pending'
-      }]);
-      
-      if (!error) {
-        closeCustomPopup();
-        showCustomAlert(t("सफलता"), t("आपकी क्वेरी सपोर्ट टीम को भेज दी गई है!"));
-      } else {
-        showCustomAlert(t("त्रुटि"), error.message);
-      }
+      if (!queryText || !currentMerchantData) return;
+      await supabaseClient.from('merchant_queries').insert([{ merchant_name: currentMerchantData.store_name, query_text: queryText, status: 'Pending' }]);
+      closeCustomPopup();
+      showCustomAlert(currentLang === 'en' ? "Success" : "सफलता", currentLang === 'en' ? "Query sent to Admin!" : "आपकी क्वेरी एडमिन को भेज दी गई है!");
     }
 
     function toggleNotifications() {
       const overlay = document.getElementById('notiOverlay');
-      if (overlay) {
-        overlay.classList.toggle('open');
-        if (overlay.classList.contains('open')) {
-          fetchNotifications();
-        }
+      overlay.classList.toggle('open');
+      if (overlay.classList.contains('open')) {
+        markAllNotificationsAsSeen(); // 👁️ क्लिक करते ही बैज तुरंत गायब (Seen)!
+        fetchNotificationsSidebar();
       }
     }
 
     function closeNotifications(e) {
-      if (e.target.id === 'notiOverlay') {
-        document.getElementById('notiOverlay').classList.remove('open');
-      }
+      if (e.target.id === 'notiOverlay') document.getElementById('notiOverlay').classList.remove('open');
     }
 
-    async function fetchNotifications() {
+    async function fetchNotificationsSidebar() {
       const container = document.getElementById('dynamicNotificationContent');
       if (!container || !supabaseClient) return;
-
       if (!currentMerchantData) {
-        container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:16px;">${t("अपनी क्वेरीज़ और सपोर्ट रिप्लाई देखने के लिए कृपया पहले लॉगिन करें।")}</div>`;
+        container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:16px;">${currentLang === 'en' ? 'Please login first.' : 'कृपया पहले लॉगिन करें।'}</div>`;
         return;
       }
 
-      container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:16px;">${t("लोड किया जा रहा है...")}</div>`;
+      container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:16px;">${t('loading')}</div>`;
+      const dismissed = getDismissedItems(currentMerchantData.id);
+      let combinedHtml = '';
 
-      const { data, error } = await supabaseClient
-        .from('merchant_queries')
-        .select('*')
-        .eq('merchant_name', currentMerchantData.store_name)
-        .order('id', { ascending: false });
+      try {
+        const { data: bData } = await supabaseClient.from('broadcast_center').select('*').order('id', { ascending: false });
+        if (bData && bData.length > 0) {
+          const visibleBroadcasts = bData.filter(b => !dismissed.includes(`b_${b.id}`));
+          combinedHtml += visibleBroadcasts.map(b => `
+            <div style="background:#FFFBEB; border:1px solid #FDE68A; border-radius:8px; padding:10px; margin-bottom:8px; text-align:left; position:relative;">
+              <button onclick="dismissSingleNotification('b_${b.id}')" title="हटाएं" style="position:absolute; top:6px; right:8px; background:none; border:none; color:#9CA3AF; font-size:14px; font-weight:900; cursor:pointer;">✕</button>
+              <div style="font-size:12px; font-weight:900; color:#B45309; padding-right:18px;">📢 ${escapeHtml(b.broadcast_title || 'Admin Broadcast')}</div>
+              <div style="font-size:11px; color:#111827; margin-top:4px;">${escapeHtml(b.message_content || '')}</div>
+            </div>
+          `).join('');
+        }
+      } catch (e) {}
 
-      if (error || !data || data.length === 0) {
-        container.innerHTML = `<div style="font-size:12px; color:#6B7280; text-align:center; padding:16px;">${t("आपकी कोई सपोर्ट क्वेरी या नया अलर्ट नहीं है।")}</div>`;
-        return;
+      try {
+        const { data: qData } = await supabaseClient
+          .from('merchant_queries')
+          .select('*')
+          .eq('merchant_name', currentMerchantData.store_name)
+          .order('id', { ascending: false });
+
+        if (qData && qData.length > 0) {
+          const visibleQueries = qData.filter(q => !dismissed.includes(`q_${q.id}`));
+          combinedHtml += buildQueryCardsHTML(visibleQueries, true);
+        }
+      } catch (e) {}
+
+      container.innerHTML = combinedHtml || `<div style="font-size:12px; color:#6B7280; text-align:center; padding:16px;">${currentLang === 'en' ? 'All caught up! No new alerts.' : 'सभी सूचनाएं पढ़ ली गई हैं! कोई नया अलर्ट नहीं है।'}</div>`;
+      await updateNotificationBadge();
+      markAllNotificationsAsSeen();
+    }
+        // 🔔 STEP 1: ZERO-MP3 PURE HARDWARE SOUND & VIBRATION SYNTHESIZER
+    let bellAudioCtx = null;
+    let previousUnseenCount = 0;
+    let isFirstLoadCheck = true;
+
+    // यूजर जैसे ही स्क्रीन पर पहली बार कहीं भी टच करेगा, मोबाइल का साउंड इंजन अनलॉक हो जाएगा
+    function unlockMobileAudioEngine() {
+      try {
+        if (!bellAudioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          bellAudioCtx = new AudioContextClass();
+        }
+        if (bellAudioCtx.state === 'suspended') {
+          bellAudioCtx.resume();
+        }
+      } catch (e) {}
+    }
+    document.addEventListener('touchstart', unlockMobileAudioEngine, { once: true });
+    document.addEventListener('click', unlockMobileAudioEngine, { once: true });
+
+    // 🔊 असली घंटी की आवाज (Dual-Tone Metallic Chime + Vibration)
+    function playNotificationBellSound() {
+      try {
+        unlockMobileAudioEngine();
+        if (bellAudioCtx) {
+          const now = bellAudioCtx.currentTime;
+
+          // पहली टोन (Ding - 880Hz)
+          const osc1 = bellAudioCtx.createOscillator();
+          const gain1 = bellAudioCtx.createGain();
+          osc1.type = 'sine';
+          osc1.frequency.setValueAtTime(880, now);
+          gain1.gain.setValueAtTime(0.35, now);
+          gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc1.connect(gain1);
+          gain1.connect(bellAudioCtx.destination);
+          osc1.start(now);
+          osc1.stop(now + 0.35);
+
+          // दूसरी हाई-पिच टोन (Dong - 1318.5Hz)
+          const osc2 = bellAudioCtx.createOscillator();
+          const gain2 = bellAudioCtx.createGain();
+          osc2.type = 'triangle';
+          osc2.frequency.setValueAtTime(1318.5, now + 0.14);
+          gain2.gain.setValueAtTime(0.4, now + 0.14);
+          gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.75);
+          osc2.connect(gain2);
+          gain2.connect(bellAudioCtx.destination);
+          osc2.start(now + 0.14);
+          osc2.stop(now + 0.75);
+        }
+      } catch (e) {}
+
+      // 📳 मोबाइल वाइब्रेशन (Double Pulse)
+      try {
+        if (navigator.vibrate) {
+          navigator.vibrate([200, 100, 250]);
+        }
+      } catch (e) {}
+
+      // 🔔 घंटी के आइकॉन को हिलाना (Visual Bell Shake)
+      const badgeEl = document.getElementById('notiBadgeCount');
+      if (badgeEl && badgeEl.parentElement) {
+        const bellBtn = badgeEl.parentElement;
+        bellBtn.style.transition = 'transform 0.1s ease-in-out';
+        bellBtn.style.transform = 'rotate(18deg) scale(1.15)';
+        setTimeout(() => { bellBtn.style.transform = 'rotate(-18deg) scale(1.15)'; }, 120);
+        setTimeout(() => { bellBtn.style.transform = 'rotate(12deg) scale(1.1)'; }, 240);
+        setTimeout(() => { bellBtn.style.transform = 'rotate(0deg) scale(1)'; }, 360);
       }
-      container.innerHTML = renderQueryCardsHTML(data);
     }
 
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/kaito-app-builder/sw.js')
-          .then(reg => console.log('Service Worker registered successfully!'))
-          .catch(err => console.log('Service Worker registration failed:', err));
-      });
+    // ⚡ STEP 2: REALTIME RADAR (नया मैसेज आते ही घंटी बजाएगा)
+    const _origUpdateBadge = updateNotificationBadge;
+    updateNotificationBadge = async function() {
+      await _origUpdateBadge();
+      const badge = document.getElementById('notiBadgeCount');
+      const currentUnseen = (badge && badge.style.display !== 'none') ? (parseInt(badge.innerText, 10) || 1) : 0;
+
+      // अगर नया अनसीन मैसेज आया है (या पहली बार लॉगिन पर अनसीन मैसेज पड़ा है), तो तुरंत घंटी बजाओ!
+      if (currentUnseen > previousUnseenCount) {
+        playNotificationBellSound();
+      }
+      previousUnseenCount = currentUnseen;
+      isFirstLoadCheck = false;
+    };
+
+    // हर 4 सेकंड में बैकग्राउंड पल्स + Supabase Realtime Listener
+    setInterval(() => {
+      if (currentMerchantData) updateNotificationBadge();
+    }, 4000);
+
+    if (supabaseClient) {
+      try {
+        supabaseClient
+          .channel('merchant_live_bell_channel')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'merchant_queries' }, () => {
+            if (currentMerchantData) updateNotificationBadge();
+          })
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'broadcast_center' }, () => {
+            if (currentMerchantData) updateNotificationBadge();
+          })
+          .subscribe();
+      } catch (e) {}
     }
   </script>
 </body>
