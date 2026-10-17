@@ -1,7 +1,7 @@
 {
   "name": "Star Merchant",
   "short_name": "StarMerchant",
-  "id": "/kaito-app-builder/index.html",
+  "id": "star-merchant",
   "start_url": "/kaito-app-builder/index.html",
   "scope": "/kaito-app-builder/",
   "display": "standalone",
@@ -22,19 +22,19 @@
   ],
   "icons": [
     {
-      "src": "/kaito-app-builder/logo-small.png",
+      "src": "https://abhishekdevtech1122-sudo.github.io/kaito-app-builder/logo-small.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/kaito-app-builder/large-logo.png",
+      "src": "https://abhishekdevtech1122-sudo.github.io/kaito-app-builder/large-logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/kaito-app-builder/large-logo.png",
+      "src": "https://abhishekdevtech1122-sudo.github.io/kaito-app-builder/large-logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
