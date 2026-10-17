@@ -1534,15 +1534,14 @@
         setTimeout(() => { bellBtn.style.transform = 'rotate(0deg) scale(1)'; }, 360);
       }
     }
-
-    // ⚡ STEP 2: REALTIME RADAR (नया मैसेज आते ही घंटी बजाएगा)
+        // ⚡ STEP 2: REALTIME RADAR (नया मैसेज आने पर घंटी बजाएगा)
     const _origUpdateBadge = updateNotificationBadge;
     updateNotificationBadge = async function() {
       await _origUpdateBadge();
       const badge = document.getElementById('notiBadgeCount');
       const currentUnseen = (badge && badge.style.display !== 'none') ? (parseInt(badge.innerText, 10) || 1) : 0;
 
-      // अगर नया अनसीन मैसेज आया है (या पहली बार लॉगिन पर अनसीन मैसेज पड़ा है), तो तुरंत घंटी बजाओ!
+      // अगर नया अनसीन मैसेज आया है, तो तुरंत घंटी बजाो!
       if (currentUnseen > previousUnseenCount) {
         playNotificationBellSound();
       }
@@ -1568,18 +1567,6 @@
           .subscribe();
       } catch (e) {}
     }
-            // 🚀 STEP 3: SERVICE WORKER & PWA ENGINE LOCK
-        if ('serviceWorker' in navigator) {
-          window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/kaito-app-builder/sw.js', { scope: '/kaito-app-builder/' })
-              .then((reg) => {
-                console.log('Star Empire Service Worker Locked:', reg.scope);
-              })
-              .catch((err) => {
-                console.error('SW Registration Failed:', err);
-              });
-          });
-        }
   </script>
 </body>
 </html>
